@@ -1,4 +1,4 @@
-# DataScientist_Capstone Repository
+# DataScientist Capstone Repository
 
 # Project Name: 
 
