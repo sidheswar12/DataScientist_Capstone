@@ -117,7 +117,8 @@ To achieve the optimal user experience, using more capable hardware and moving t
 
 The user experience could also be improved significantly by using MXNet, which is a deep learning library that is better optimized for mobile devices than TensorFlow. The speedup wouldn’t be enough for running text extraction on the device, but it would reduce the classification delay significantly.
 
-## Blog Post Link
+### Blog Post Link
+https://medium.com/@sidheswar.ghosh/churn-prediction-7b95a2ecbaa5
 
 
 
