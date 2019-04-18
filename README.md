@@ -1,6 +1,6 @@
 # DataScientist Capstone Repository
 
-# Project Name: 
+# Project Name
 
 Sparkify-Project
 Data Science Capstone - Churn Prediction at Sparkify
@@ -13,7 +13,7 @@ The project "Sparkify" is part of Data Science Nanodegree from Udacity. This is 
 1. Manipulate large and realistic datasets with Spark to engineer relevant features for predicting churn.
 2. Use Spark MLlib to build machine learning models with large datasets.
 3. What could be done with non-distributed technologies like scikit-learn.
-## List of possible event types are:
+## List of possible event types are
 
 --------------------------
 
@@ -63,14 +63,11 @@ The project "Sparkify" is part of Data Science Nanodegree from Udacity. This is 
 
 The project is high intensity because of the large amount of data, all of our data wrangling and model creation has to be done using Apache Spark. This adds another level of abstraction on top of the already well-established process. But it does enable us to work with large data than we would otherwise be able to.
 
-
-# Result comparisons:
-
-## Expected Results:
+## Expected Results
 
 A model for churn prediction have been created and evaluated. The model have been trained and tested on a subset of the 12GB of data, and the final testing should happen on completely separate validation set. An accuracy, F1-Score confusion matrix will be used to evaluate the performance and feasibility of the model.
 
-## Actual Results:
+## Actual Results
 
 End of this project, two main iterations on a churn-prediction model were implemented and evaluated:
 1. Model used a simple pivot of the event that seemed to contain the most relevant difference between churning.
@@ -95,9 +92,9 @@ Using these features, the Gradient Boosted Trees algorithm was once again traine
 
 The results is much better than the initial attempt. With F1-score of 89.1% for validation data, and 294 correctly identified churners, the second iteration of the model is great first model which could be fine-tuned and improved even more.
 
-## Overview of Files:
+## Overview of Files
 
-## Data Files:
+## Data Files
 
 README.md - This readme
 
@@ -120,10 +117,10 @@ To achieve the optimal user experience, using more capable hardware and moving t
 
 The user experience could also be improved significantly by using MXNet, which is a deep learning library that is better optimized for mobile devices than TensorFlow. The speedup wouldn’t be enough for running text extraction on the device, but it would reduce the classification delay significantly.
 
-### Blog Post link can be found here: 
+## Blog Post Link
 
 
 
-## References:
+## References
 
 In this project, the course material at Udacity has been used for reference. On top of that, the official pySpark documentation has also been used "https://spark.apache.org/docs/latest/api/python/index.html"
