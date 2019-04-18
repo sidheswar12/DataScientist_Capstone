@@ -57,7 +57,7 @@ The project "Sparkify" is part of Data Science Nanodegree from Udacity. This is 
 
 --------------------------
 
-#### Where the type 'Cancellation Confirmation' is set equal to users churning?
+#### Where the type 'Cancellation Confirmation' is set equal to users churning.
 
 ## Problem
 
