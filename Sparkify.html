@@ -13143,7 +13143,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[199]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># import libraries</span>
@@ -13161,6 +13161,7 @@ div#notebook {
 <span class="kn">from</span> <span class="nn">pyspark.ml.classification</span> <span class="k">import</span> <span class="n">LogisticRegression</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">LinearSVC</span><span class="p">,</span> <span class="n">GBTClassifier</span>
 <span class="kn">from</span> <span class="nn">pyspark.ml.evaluation</span> <span class="k">import</span> <span class="n">BinaryClassificationEvaluator</span>
 <span class="kn">from</span> <span class="nn">pyspark.mllib.evaluation</span> <span class="k">import</span> <span class="n">MulticlassMetrics</span>
+<span class="kn">import</span> <span class="nn">pyspark.sql.functions</span> <span class="k">as</span> <span class="nn">psqf</span>
 </pre></div>
 
     </div>
@@ -13168,9 +13169,24 @@ div#notebook {
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Load-and-Clean-Dataset">Load and Clean Dataset<a class="anchor-link" href="#Load-and-Clean-Dataset">&#182;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In this workspace, the mini-dataset file is mini_sparkify_event_data.json. Load and clean the dataset, checking for invalid or missing data - for example, records without userids or sessionids.</p>
+
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[200]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Create a Spark session</span>
@@ -13180,8 +13196,56 @@ div#notebook {
     <span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
 
 <span class="n">df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="s1">&#39;mini_sparkify_event_data.json&#39;</span><span class="p">)</span>
+</pre></div>
 
-<span class="c1"># Print schema for future reference</span>
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[201]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+--------------+---------+---------+------+-------------+--------+---------+-----+---------------+------+--------+-------------+---------+---------+------+-------------+--------------------+------+
+|        artist|     auth|firstName|gender|itemInSession|lastName|   length|level|       location|method|    page| registration|sessionId|     song|status|           ts|           userAgent|userId|
++--------------+---------+---------+------+-------------+--------+---------+-----+---------------+------+--------+-------------+---------+---------+------+-------------+--------------------+------+
+|Martha Tilston|Logged In|    Colin|     M|           50| Freeman|277.89016| paid|Bakersfield, CA|   PUT|NextSong|1538173362000|       29|Rockpools|   200|1538352117000|Mozilla/5.0 (Wind...|    30|
++--------------+---------+---------+------+-------------+--------+---------+-----+---------------+------+--------+-------------+---------+---------+------+-------------+--------------------+------+
+only showing top 1 row
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[202]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Print schema for future reference</span>
 <span class="n">df</span><span class="o">.</span><span class="n">printSchema</span><span class="p">()</span>
 </pre></div>
 
@@ -13227,22 +13291,12 @@ div#notebook {
 </div>
 
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Load-and-Clean-Dataset">Load and Clean Dataset<a class="anchor-link" href="#Load-and-Clean-Dataset">&#182;</a></h1><p>In this workspace, the mini-dataset file is <code>mini_sparkify_event_data.json</code>. Load and clean the dataset, checking for invalid or missing data - for example, records without userids or sessionids.</p>
-
-</div>
-</div>
-</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[203]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Clean dataset with Empty userid</span>
-<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">userId</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Empty userIds: {df.filter(df.userId == &#39;&#39;).count()}&quot;</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 
     </div>
@@ -13259,7 +13313,7 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Empty userIds: 0
+<pre>[Row(artist=&#39;Martha Tilston&#39;, auth=&#39;Logged In&#39;, firstName=&#39;Colin&#39;, gender=&#39;M&#39;, itemInSession=50, lastName=&#39;Freeman&#39;, length=277.89016, level=&#39;paid&#39;, location=&#39;Bakersfield, CA&#39;, method=&#39;PUT&#39;, page=&#39;NextSong&#39;, registration=1538173362000, sessionId=29, song=&#39;Rockpools&#39;, status=200, ts=1538352117000, userAgent=&#39;Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0&#39;, userId=&#39;30&#39;)]
 </pre>
 </div>
 </div>
@@ -13267,6 +13321,377 @@ div#notebook {
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[204]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">total</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+<span class="n">missing</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">isNull</span><span class="p">())</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+<span class="n">percentage</span> <span class="o">=</span> <span class="n">missing</span> <span class="o">*</span><span class="mf">100.0</span> <span class="o">/</span><span class="n">total</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Dropping-Missing-Items-:--">Dropping Missing Items : -<a class="anchor-link" href="#Dropping-Missing-Items-:--">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[205]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Missing Value in Columns :- &quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">colName</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">dtypes</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">colName</span><span class="p">,</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">colName</span><span class="p">]</span><span class="o">.</span><span class="n">isNull</span><span class="p">())</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>286500 18
+Missing Value in Columns :- 
+artist : 58392
+auth : 0
+firstName : 8346
+gender : 8346
+itemInSession : 0
+lastName : 8346
+length : 58392
+level : 0
+location : 8346
+method : 0
+page : 0
+registration : 8346
+sessionId : 0
+song : 58392
+status : 0
+ts : 0
+userAgent : 8346
+userId : 0
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="We-can-see-from-above-ther-are-missing-items:">We can see from above ther are missing items:<a class="anchor-link" href="#We-can-see-from-above-ther-are-missing-items:">&#182;</a></h4><ol>
+<li><p>userID, itemInSession, sessionID, time stamp,authorization, level, method and page has zero missing values.</p>
+</li>
+<li><p>Artist, Length and Song have same number of missing values</p>
+</li>
+<li><p>User Agent, registration, first name, last name, location and gender have the same number of missing values.</p>
+</li>
+</ol>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[206]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">isNull</span><span class="p">())</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of rows with missing registration: &quot;</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">isNull</span><span class="p">())</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of rows with missing registration, name, gender, location and user agent: &quot;</span><span class="p">,</span>\
+      <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">isNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">df</span><span class="o">.</span><span class="n">firstName</span><span class="o">.</span><span class="n">isNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">df</span><span class="o">.</span><span class="n">lastName</span><span class="o">.</span><span class="n">isNull</span><span class="p">()</span> <span class="o">&amp;</span>
+               <span class="n">df</span><span class="o">.</span><span class="n">gender</span><span class="o">.</span><span class="n">isNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">df</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">isNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">df</span><span class="o">.</span><span class="n">userAgent</span><span class="o">.</span><span class="n">isNull</span><span class="p">())</span><span class="o">.</span><span class="n">count</span><span class="p">())</span> 
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">registration</span><span class="o">.</span><span class="n">isNotNull</span><span class="p">())</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+----------+---------+------+-------------+--------+------+-----+--------+------+----+------------+---------+----+------+-------------+---------+------+
+|artist|auth      |firstName|gender|itemInSession|lastName|length|level|location|method|page|registration|sessionId|song|status|ts           |userAgent|userId|
++------+----------+---------+------+-------------+--------+------+-----+--------+------+----+------------+---------+----+------+-------------+---------+------+
+|null  |Logged Out|null     |null  |100          |null    |null  |free |null    |GET   |Home|null        |8        |null|200   |1538355745000|null     |      |
++------+----------+---------+------+-------------+--------+------+-----+--------+------+----+------------+---------+----+------+-------------+---------+------+
+only showing top 1 row
+
+Number of rows with missing registration:  8346
+Number of rows with missing registration, name, gender, location and user agent:  8346
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[207]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Missing percentage:-&quot;</span><span class="p">,</span><span class="n">percentage</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Missing percentage:- 2.913089005235602
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The above registration are missing (8346) at the same row, where the users are not logged in. So, We can't identify these users individually and they constitute just ~3% of the records we drop the rows where registration is 0.</p>
+<p>Total Records : 286500</p>
+<p>Missing Registration: 8346</p>
+<p>Missing Registration : 2.91%</p>
+<h3 id="Columns-to-Drop">Columns to Drop<a class="anchor-link" href="#Columns-to-Drop">&#182;</a></h3><ol>
+<li>First name and last name are not useful</li>
+<li>Auth has no variability</li>
+<li>Uniquely identify a user by user id, so registration number isn't needed</li>
+<li>All activities of a user will be collected without factoring in timestamp</li>
+</ol>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[208]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of rows with missing artist: &quot;</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">artist</span><span class="o">.</span><span class="n">isNull</span><span class="p">())</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of rows with missing artist, song, song length in same row: &quot;</span><span class="p">,</span>\
+      <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">artist</span><span class="o">.</span><span class="n">isNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">df</span><span class="o">.</span><span class="n">song</span><span class="o">.</span><span class="n">isNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">df</span><span class="o">.</span><span class="n">length</span><span class="o">.</span><span class="n">isNull</span><span class="p">())</span><span class="o">.</span><span class="n">count</span><span class="p">())</span> 
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Next song page with missing song: &quot;</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">song</span><span class="o">.</span><span class="n">isNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">page</span><span class="o">==</span><span class="s2">&quot;NextSong&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">count</span><span class="p">())</span> 
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Song on a different page: &quot;</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">song</span><span class="o">.</span><span class="n">isNotNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">page</span><span class="o">!=</span><span class="s2">&quot;NextSong&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">count</span><span class="p">())</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Number of rows with missing artist:  50046
+Number of rows with missing artist, song, song length in same row:  50046
+Next song page with missing song:  0
+Song on a different page:  0
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[209]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Missing Registration Percentage:-&quot;</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">artist</span><span class="o">.</span><span class="n">isNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">df</span><span class="o">.</span><span class="n">song</span><span class="o">.</span><span class="n">isNull</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">df</span><span class="o">.</span><span class="n">length</span><span class="o">.</span><span class="n">isNull</span><span class="p">())</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">*</span><span class="mf">100.0</span><span class="p">)</span><span class="o">/</span><span class="n">total</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Missing Registration Percentage:- 17.468062827225133
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There are song which has missing values as length and artist we find,</p>
+<p>When song is null, length is not defined as well as artist. Song is only present on the page nextSong.</p>
+<p>Total Records : 286500</p>
+<p>Missing Song (not a song page): 58392</p>
+<p>Missing Registration : 17.47%</p>
+<p>17.47% rows do not contain songs but these other pages can be relevant in determining churn so we will use it later, instead of dropping it.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[210]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">,</span><span class="s1">&#39;page&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">,</span><span class="s1">&#39;method&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">,</span><span class="s1">&#39;method&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+-----+-------------------------+------+
+|level|page                     |count |
++-----+-------------------------+------+
+|free |About                    |93    |
+|paid |About                    |402   |
+|free |Add Friend               |893   |
+|paid |Add Friend               |3384  |
+|paid |Add to Playlist          |5354  |
+|free |Add to Playlist          |1172  |
+|paid |Cancel                   |31    |
+|free |Cancel                   |21    |
+|free |Cancellation Confirmation|21    |
+|paid |Cancellation Confirmation|31    |
+|paid |Downgrade                |2055  |
+|free |Error                    |53    |
+|paid |Error                    |199   |
+|paid |Help                     |1132  |
+|free |Help                     |322   |
+|paid |Home                     |7461  |
+|free |Home                     |2621  |
+|free |Logout                   |922   |
+|paid |Logout                   |2304  |
+|free |NextSong                 |41991 |
+|paid |NextSong                 |186117|
+|paid |Roll Advert              |246   |
+|free |Roll Advert              |3687  |
+|free |Save Settings            |85    |
+|paid |Save Settings            |225   |
+|paid |Settings                 |1154  |
+|free |Settings                 |360   |
+|paid |Submit Downgrade         |63    |
+|free |Submit Upgrade           |159   |
+|paid |Thumbs Down              |1933  |
+|free |Thumbs Down              |613   |
+|free |Thumbs Up                |2209  |
+|paid |Thumbs Up                |10342 |
+|free |Upgrade                  |499   |
++-----+-------------------------+------+
+
++-------------------------+------+------+
+|page                     |method|count |
++-------------------------+------+------+
+|About                    |GET   |495   |
+|Add Friend               |PUT   |4277  |
+|Add to Playlist          |PUT   |6526  |
+|Cancel                   |PUT   |52    |
+|Cancellation Confirmation|GET   |52    |
+|Downgrade                |GET   |2055  |
+|Error                    |GET   |252   |
+|Help                     |GET   |1454  |
+|Home                     |GET   |10082 |
+|Logout                   |PUT   |3226  |
+|NextSong                 |PUT   |228108|
+|Roll Advert              |GET   |3933  |
+|Save Settings            |PUT   |310   |
+|Settings                 |GET   |1514  |
+|Submit Downgrade         |PUT   |63    |
+|Submit Upgrade           |PUT   |159   |
+|Thumbs Down              |PUT   |2546  |
+|Thumbs Up                |PUT   |12551 |
+|Upgrade                  |GET   |499   |
++-------------------------+------+------+
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Looking-into-above-table-:">Looking into above table :<a class="anchor-link" href="#Looking-into-above-table-:">&#182;</a></h4><p>Free users can reach upgrade and submit upgrade page
+Paid users can reach downgrade and submit downgrade page</p>
+<p>The remaining pages are common. A page has either GET or PUT method not both.</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
@@ -13280,7 +13705,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[211]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Observation</span>
@@ -13331,11 +13756,11 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[212]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Look at 2 rows for sample</span>
-<span class="n">df</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13348,14 +13773,13 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[5]:</div>
+    <div class="prompt output_prompt">Out[212]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>[Row(artist=&#39;Martha Tilston&#39;, auth=&#39;Logged In&#39;, firstName=&#39;Colin&#39;, gender=&#39;M&#39;, itemInSession=50, lastName=&#39;Freeman&#39;, length=277.89016, level=&#39;paid&#39;, location=&#39;Bakersfield, CA&#39;, method=&#39;PUT&#39;, page=&#39;NextSong&#39;, registration=1538173362000, sessionId=29, song=&#39;Rockpools&#39;, status=200, ts=1538352117000, userAgent=&#39;Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0&#39;, userId=&#39;30&#39;),
- Row(artist=&#39;Five Iron Frenzy&#39;, auth=&#39;Logged In&#39;, firstName=&#39;Micah&#39;, gender=&#39;M&#39;, itemInSession=79, lastName=&#39;Long&#39;, length=236.09424, level=&#39;free&#39;, location=&#39;Boston-Cambridge-Newton, MA-NH&#39;, method=&#39;PUT&#39;, page=&#39;NextSong&#39;, registration=1538331630000, sessionId=8, song=&#39;Canada&#39;, status=200, ts=1538352180000, userAgent=&#39;&#34;Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.103 Safari/537.36&#34;&#39;, userId=&#39;9&#39;)]</pre>
+<pre>[Row(artist=&#39;Martha Tilston&#39;, auth=&#39;Logged In&#39;, firstName=&#39;Colin&#39;, gender=&#39;M&#39;, itemInSession=50, lastName=&#39;Freeman&#39;, length=277.89016, level=&#39;paid&#39;, location=&#39;Bakersfield, CA&#39;, method=&#39;PUT&#39;, page=&#39;NextSong&#39;, registration=1538173362000, sessionId=29, song=&#39;Rockpools&#39;, status=200, ts=1538352117000, userAgent=&#39;Mozilla/5.0 (Windows NT 6.1; WOW64; rv:31.0) Gecko/20100101 Firefox/31.0&#39;, userId=&#39;30&#39;)]</pre>
 </div>
 
 </div>
@@ -13366,7 +13790,341 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[213]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">()</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+-----+
+|level|
++-----+
+| free|
+| paid|
++-----+
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[214]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">level_counts</span><span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s1">&#39;level&#39;</span><span class="p">:</span><span class="s1">&#39;count&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">withColumnRenamed</span><span class="p">(</span><span class="s2">&quot;count(level)&quot;</span><span class="p">,</span> <span class="s2">&quot;level_count&quot;</span><span class="p">)</span>
+<span class="n">level_counts</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+-----+-----------+
+|level|level_count|
++-----+-----------+
+| free|      55721|
+| paid|     222433|
++-----+-----------+
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[215]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">page_counts</span><span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s1">&#39;page&#39;</span><span class="p">:</span><span class="s1">&#39;count&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">withColumnRenamed</span><span class="p">(</span><span class="s2">&quot;count(page)&quot;</span><span class="p">,</span> <span class="s2">&quot;page_count&quot;</span><span class="p">)</span>
+<span class="n">page_counts</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+--------------------+----------+
+|                page|page_count|
++--------------------+----------+
+|              Cancel|        52|
+|    Submit Downgrade|        63|
+|         Thumbs Down|      2546|
+|                Home|     10082|
+|           Downgrade|      2055|
+|         Roll Advert|      3933|
+|              Logout|      3226|
+|       Save Settings|       310|
+|Cancellation Conf...|        52|
+|               About|       495|
+|            Settings|      1514|
+|     Add to Playlist|      6526|
+|          Add Friend|      4277|
+|            NextSong|    228108|
+|           Thumbs Up|     12551|
+|                Help|      1454|
+|             Upgrade|       499|
+|               Error|       252|
+|      Submit Upgrade|       159|
++--------------------+----------+
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[216]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">level_counts</span><span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s1">&#39;level&#39;</span><span class="p">:</span><span class="s1">&#39;count&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">withColumnRenamed</span><span class="p">(</span><span class="s2">&quot;count(level)&quot;</span><span class="p">,</span> <span class="s2">&quot;level_count&quot;</span><span class="p">)</span>
+<span class="n">level_counts</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+-----+-----------+
+|level|level_count|
++-----+-----------+
+| free|      55721|
+| paid|     222433|
++-----+-----------+
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[217]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Cancel and Cancellation Confirmation samples in the dataset</span>
+<span class="n">cancel_events</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">psqf</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;Cancel&#39;</span><span class="p">,</span><span class="s1">&#39;Cancellation Confirmation&#39;</span><span class="p">]))</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s1">&#39;userID&#39;</span><span class="p">,</span><span class="s1">&#39;page&#39;</span><span class="p">,</span> <span class="s1">&#39;firstName&#39;</span><span class="p">,</span> <span class="s1">&#39;lastName&#39;</span><span class="p">,</span><span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="s1">&#39;auth&#39;</span><span class="p">])</span>
+<span class="n">cancel_events</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+-------------------------+---------+--------+-------------+---------+
+|userID|page                     |firstName|lastName|ts           |auth     |
++------+-------------------------+---------+--------+-------------+---------+
+|18    |Cancel                   |Adriel   |Mendoza |1538943740000|Logged In|
+|18    |Cancellation Confirmation|Adriel   |Mendoza |1538943990000|Cancelled|
+|32    |Cancel                   |Diego    |Mckee   |1539033031000|Logged In|
+|32    |Cancellation Confirmation|Diego    |Mckee   |1539033046000|Cancelled|
+|125   |Cancel                   |Mason    |Hart    |1539318918000|Logged In|
++------+-------------------------+---------+--------+-------------+---------+
+only showing top 5 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[218]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">churn_event</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">psqf</span><span class="o">.</span><span class="n">collect_list</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s1">&#39;pages&#39;</span><span class="p">))</span>
+<span class="c1"># define 1 as churned, 0 otherwise</span>
+<span class="n">churn_f</span> <span class="o">=</span> <span class="n">psqf</span><span class="o">.</span><span class="n">udf</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="s1">&#39;Cancel&#39;</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">churn_event</span> <span class="o">=</span> <span class="n">churn_event</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="n">churn_f</span><span class="p">(</span><span class="n">churn_event</span><span class="o">.</span><span class="n">pages</span><span class="p">))</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;pages&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[219]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">labeled_df</span>  <span class="o">=</span> <span class="n">churn_event</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;userId&#39;</span><span class="p">)</span>
+<span class="n">labeled_df</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+-----+--------------------+---------+---------+------+-------------+---------+---------+-----+--------------------+------+-----------+-------------+---------+--------------------+------+-------------+--------------------+
+|userId|label|              artist|     auth|firstName|gender|itemInSession| lastName|   length|level|            location|method|       page| registration|sessionId|                song|status|           ts|           userAgent|
++------+-----+--------------------+---------+---------+------+-------------+---------+---------+-----+--------------------+------+-----------+-------------+---------+--------------------+------+-------------+--------------------+
+|100010|    0|Sleeping With Sirens|Logged In| Darianna|     F|            0|Carpenter|202.97098| free|Bridgeport-Stamfo...|   PUT|   NextSong|1538016340000|       31|Captain Tyin Knot...|   200|1539003534000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|Francesca Battist...|Logged In| Darianna|     F|            1|Carpenter|196.54485| free|Bridgeport-Stamfo...|   PUT|   NextSong|1538016340000|       31|Beautiful_ Beauti...|   200|1539003736000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|              Brutha|Logged In| Darianna|     F|            2|Carpenter|263.13098| free|Bridgeport-Stamfo...|   PUT|   NextSong|1538016340000|       31|          She&#39;s Gone|   200|1539003932000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|                null|Logged In| Darianna|     F|            3|Carpenter|     null| free|Bridgeport-Stamfo...|   PUT|  Thumbs Up|1538016340000|       31|                null|   307|1539003933000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|         Josh Ritter|Logged In| Darianna|     F|            4|Carpenter|316.23791| free|Bridgeport-Stamfo...|   PUT|   NextSong|1538016340000|       31|      Folk Bloodbath|   200|1539004195000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|               LMFAO|Logged In| Darianna|     F|            5|Carpenter|183.74485| free|Bridgeport-Stamfo...|   PUT|   NextSong|1538016340000|       31|                 Yes|   200|1539004511000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|         OneRepublic|Logged In| Darianna|     F|            6|Carpenter|224.67873| free|Bridgeport-Stamfo...|   PUT|   NextSong|1538016340000|       31|             Secrets|   200|1539004694000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|       Dwight Yoakam|Logged In| Darianna|     F|            7|Carpenter| 239.3073| free|Bridgeport-Stamfo...|   PUT|   NextSong|1538016340000|       31|      You&#39;re The One|   200|1539004918000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|                null|Logged In| Darianna|     F|            8|Carpenter|     null| free|Bridgeport-Stamfo...|   GET|Roll Advert|1538016340000|       31|                null|   200|1539004961000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|      The Chordettes|Logged In| Darianna|     F|            9|Carpenter|142.41914| free|Bridgeport-Stamfo...|   PUT|   NextSong|1538016340000|       31|          Mr Sandman|   200|1539005157000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|Coko featuring Ki...|Logged In| Darianna|     F|           10|Carpenter| 249.3122| free|Bridgeport-Stamfo...|   PUT|   NextSong|1538016340000|       31|           I Get Joy|   200|1539005299000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|            The Cure|Logged In| Darianna|     F|           11|Carpenter| 52.27057| free|Bridgeport-Stamfo...|   PUT|   NextSong|1538016340000|       31|     The Final Sound|   200|1539005548000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|                null|Logged In| Darianna|     F|           12|Carpenter|     null| free|Bridgeport-Stamfo...|   GET|Roll Advert|1538016340000|       31|                null|   200|1539005571000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|Kid Cudi Vs Crookers|Logged In| Darianna|     F|           13|Carpenter|162.97751| free|Bridgeport-Stamfo...|   PUT|   NextSong|1538016340000|       31|        Day &#39;N&#39; Nite|   200|1539005600000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|                null|Logged In| Darianna|     F|           14|Carpenter|     null| free|Bridgeport-Stamfo...|   PUT|  Thumbs Up|1538016340000|       31|                null|   307|1539005601000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|            Yeasayer|Logged In| Darianna|     F|           15|Carpenter|323.44771| free|Bridgeport-Stamfo...|   PUT|   NextSong|1538016340000|       31|                2080|   200|1539005762000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|             Ben Lee|Logged In| Darianna|     F|           16|Carpenter|245.78567| free|Bridgeport-Stamfo...|   PUT|   NextSong|1538016340000|       31|        Ache For You|   200|1539006085000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|                null|Logged In| Darianna|     F|           17|Carpenter|     null| free|Bridgeport-Stamfo...|   GET|Roll Advert|1538016340000|       31|                null|   200|1539006103000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|  ? &amp; The Mysterians|Logged In| Darianna|     F|           18|Carpenter|128.10404| free|Bridgeport-Stamfo...|   PUT|   NextSong|1538016340000|       31|    Just Like A Rose|   200|1539006330000|&#34;Mozilla/5.0 (iPh...|
+|100010|    0|                null|Logged In| Darianna|     F|           19|Carpenter|     null| free|Bridgeport-Stamfo...|   GET|Roll Advert|1538016340000|       31|                null|   200|1539006331000|&#34;Mozilla/5.0 (iPh...|
++------+-----+--------------------+---------+---------+------+-------------+---------+---------+-----+--------------------+------+-----------+-------------+---------+--------------------+------+-------------+--------------------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[220]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">use_level_count</span> <span class="o">=</span> <span class="n">labeled_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;userId&#39;</span><span class="p">,</span> <span class="s1">&#39;Level&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<span class="n">use_level_count_pd</span>  <span class="o">=</span> <span class="n">use_level_count</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;userId&quot;</span><span class="p">,</span> <span class="s2">&quot;Level&quot;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">toPandas</span><span class="p">()</span>
+<span class="n">use_level_count_pd</span><span class="p">[[</span><span class="s1">&#39;Level&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;Level&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s1">&#39;label&#39;</span><span class="p">:</span><span class="s1">&#39;count&#39;</span><span class="p">})</span><span class="o">.</span><span class="n">unstack</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;User Level Comparison&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;User Count&#39;</span><span class="p">);</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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s88+m8svv7xh3QknnECnTp3YY489WLp0KZAkiPvvv5999tkHgPfee4+5c+cyePDgJo89duxY7r77bgAWLVrE3Llz2XbbbenUqROnnnoqAGeddRYnnXQS7733Ho8//jinnHJKw/Yff/zxBvoUzJrnBGEV65JLLmHAgAF84xvfaLJO4emgm2++ecPriGh4vuKKK/jWt75V1DGnTp3Kgw8+yBNPPMGWW27JkCFDmrwaXBJr1qyhW7duPPPMM0Xt32xDcheTVawePXrw9a9/nRtv/Oyi/QMOOIDbb78dgIkTJ3LQQQc1u4+vfOUrjB8/nvfeew+A119/nWXLlgEwdOhQXn/99bXqr1y5ku7du7Plllvy4osv8uSTTzasW7NmTcPYxq233spBBx1E165d6dOnD5MmTQKShPTss8+28Z2bFccJwiraZZddttbZTGPHjuWmm26if//+3HLLLVx//fXNbn/kkUdyxhlnMGjQIPbaay9OPvlk3n33XdasWcO8efPo0aPHWvWHDRvGqlWr6N+/P//5n//JwIEDG9ZttdVWPP/88+y77748/PDD/OAHPwCSRHXjjTey9957s+eee3LPPZ6mzNqH6pvKHVFNTU3U1tbmHUaLqkfel3cIRVnQ5Yy8QyjOqJXMmTOH3XffPe9ImvTcc88xfvx4rr322rxDadKcOXM4asL8vMMoSkf62+wIJM2IiJqW6rkFYVYC/fr1K+vkYFYMJwgzM8vkBGFmZpmcIMzMLJMThJmZZXKCMDOzTL6S2jYKG/pU4gWjj26xzocffsiwYcN4+OGHWbRoEccccwzPPfdck/WnTp3KmDFjmDJlStFxDBkyhDFjxlBT0/QZiW+++SannnoqCxYsoLq6mjvvvJPu3bszZcoUnn766YY5nczWl1sQZq00fvx4TjrpJDp37pxrHKNHj2bo0KHMnTuXoUOHMnr0aACOPvpo7r33Xj744INc47OOq90ThKSdJT0iaY6k5yX9W1reQ9IDkuamz93bOzaz9TFx4kSOP/74dcoXLFjAwQcfzIABAxgwYACPP/54w7p33nmHE088kT322INvf/vbrFmzBkgm/Rs0aBADBgzglFNOaZi6oxj33HMP55xzDgDnnHMOf/jDH4BkLqchQ4asV4vFrFAeLYhVwGURsTswELhA0h7ASOChiOgLPJQum5WlTz75hPnz51Nd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
+"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="In-above-figure-shows-the-comparison-with-free-user-vs-paid-user">In above figure shows the comparison with free user vs paid user<a class="anchor-link" href="#In-above-figure-shows-the-comparison-with-free-user-vs-paid-user">&#182;</a></h4><p>a. Paid users listen songs which length is longer than free users.</p>
+<p>b. Paid users are less although they are more likely to churn than free users.</p>
+<p>c. Users those leave the app who have lesser Thumbs Up to Thumbs Down ratio than those who are continuously using.</p>
+<p>Note: churned - 1 &amp; active - 0</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[221]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Get number of users</span>
@@ -13383,7 +14141,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[6]:</div>
+    <div class="prompt output_prompt">Out[221]:</div>
 
 
 
@@ -13400,7 +14158,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[222]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Get number of sessions</span>
@@ -13417,7 +14175,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[7]:</div>
+    <div class="prompt output_prompt">Out[222]:</div>
 
 
 
@@ -13434,7 +14192,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[223]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">churn</span> <span class="o">=</span> <span class="n">udf</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">==</span><span class="s2">&quot;Cancellation Confirmation&quot;</span><span class="p">),</span> <span class="n">IntegerType</span><span class="p">())</span>
@@ -13450,13 +14208,382 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[224]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Distribution of users downgrades and cancellations</span>
-<span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s1">&#39;userId&#39;</span><span class="p">,</span> <span class="s1">&#39;downgraded&#39;</span><span class="p">,</span> <span class="s1">&#39;cancelled&#39;</span><span class="p">])</span>\
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cancel_reg_ids</span>  <span class="o">=</span> <span class="p">[</span><span class="n">vv</span><span class="p">[</span><span class="s1">&#39;userID&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">vv</span> <span class="ow">in</span> <span class="n">cancel_events</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;userID&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">collect</span><span class="p">()]</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cancel_reg_ids</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">cancel_reg_ids</span><span class="p">)))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>104 52
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[225]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">downgrade_reg_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">vv</span><span class="p">[</span><span class="s1">&#39;userID&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">vv</span> <span class="ow">in</span> <span class="n">downgrade_events</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">&#39;userID&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">collect</span><span class="p">()]</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">downgrade_reg_ids</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">downgrade_reg_ids</span><span class="p">)))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>2055 154
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[226]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#customer who downgraded</span>
+<span class="n">downgrade_events</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">psqf</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s1">&#39;Downgrade&#39;</span><span class="p">]))</span>
+<span class="n">downgrade_events</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s1">&#39;userID&#39;</span><span class="p">,</span><span class="s1">&#39;page&#39;</span><span class="p">,</span> <span class="s1">&#39;firstName&#39;</span><span class="p">,</span> <span class="s1">&#39;lastName&#39;</span><span class="p">,</span><span class="s1">&#39;ts&#39;</span><span class="p">,</span> <span class="s1">&#39;auth&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">225</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+---------+---------+----------+-------------+---------+
+|userID|page     |firstName|lastName  |ts           |auth     |
++------+---------+---------+----------+-------------+---------+
+|54    |Downgrade|Alexi    |Warren    |1538354749000|Logged In|
+|95    |Downgrade|Faigy    |Howe      |1538373286000|Logged In|
+|95    |Downgrade|Faigy    |Howe      |1538392612000|Logged In|
+|131   |Downgrade|Kael     |Baker     |1538393618000|Logged In|
+|95    |Downgrade|Faigy    |Howe      |1538393664000|Logged In|
+|142   |Downgrade|Grant    |Flores    |1538394855000|Logged In|
+|142   |Downgrade|Grant    |Flores    |1538395054000|Logged In|
+|120   |Downgrade|Elizabeth|Washington|1538396771000|Logged In|
+|15    |Downgrade|Panav    |Myers     |1538398230000|Logged In|
+|142   |Downgrade|Grant    |Flores    |1538398648000|Logged In|
+|51    |Downgrade|Ethan    |Johnson   |1538404204000|Logged In|
+|51    |Downgrade|Ethan    |Johnson   |1538407188000|Logged In|
+|15    |Downgrade|Panav    |Myers     |1538407887000|Logged In|
+|15    |Downgrade|Panav    |Myers     |1538407906000|Logged In|
+|54    |Downgrade|Alexi    |Warren    |1538408749000|Logged In|
+|124   |Downgrade|Nicole   |Beck      |1538411637000|Logged In|
+|54    |Downgrade|Alexi    |Warren    |1538418351000|Logged In|
+|124   |Downgrade|Nicole   |Beck      |1538422416000|Logged In|
+|131   |Downgrade|Kael     |Baker     |1538432737000|Logged In|
+|51    |Downgrade|Ethan    |Johnson   |1538440504000|Logged In|
+|51    |Downgrade|Ethan    |Johnson   |1538440518000|Logged In|
+|51    |Downgrade|Ethan    |Johnson   |1538448207000|Logged In|
+|77    |Downgrade|Autumn   |Martin    |1538471417000|Logged In|
+|51    |Downgrade|Ethan    |Johnson   |1538471918000|Logged In|
+|127   |Downgrade|Aurora   |Humphrey  |1538476564000|Logged In|
+|127   |Downgrade|Aurora   |Humphrey  |1538479701000|Logged In|
+|51    |Downgrade|Ethan    |Johnson   |1538502933000|Logged In|
+|51    |Downgrade|Ethan    |Johnson   |1538507852000|Logged In|
+|38    |Downgrade|Calvin   |Marshall  |1538516444000|Logged In|
+|105   |Downgrade|Alexander|Garcia    |1538539977000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1538541301000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1538548628000|Logged In|
+|105   |Downgrade|Alexander|Garcia    |1538559422000|Logged In|
+|124   |Downgrade|Nicole   |Beck      |1538571552000|Logged In|
+|15    |Downgrade|Panav    |Myers     |1538580898000|Logged In|
+|113   |Downgrade|Madelyn  |Henson    |1538592523000|Logged In|
+|124   |Downgrade|Nicole   |Beck      |1538602229000|Logged In|
+|124   |Downgrade|Nicole   |Beck      |1538603467000|Logged In|
+|100   |Downgrade|Colin    |Larson    |1538618142000|Logged In|
+|54    |Downgrade|Alexi    |Warren    |1538630914000|Logged In|
+|58    |Downgrade|Erick    |Brooks    |1538636648000|Logged In|
+|58    |Downgrade|Erick    |Brooks    |1538642055000|Logged In|
+|124   |Downgrade|Nicole   |Beck      |1538658275000|Logged In|
+|75    |Downgrade|Amberlynn|Olson     |1538660966000|Logged In|
+|105   |Downgrade|Alexander|Garcia    |1538662603000|Logged In|
+|124   |Downgrade|Nicole   |Beck      |1538671429000|Logged In|
+|15    |Downgrade|Panav    |Myers     |1538674231000|Logged In|
+|15    |Downgrade|Panav    |Myers     |1538676105000|Logged In|
+|141   |Downgrade|Kaylenn  |Jenkins   |1538677833000|Logged In|
+|49    |Downgrade|Christan |Hopkins   |1538682285000|Logged In|
+|124   |Downgrade|Nicole   |Beck      |1538688846000|Logged In|
+|124   |Downgrade|Nicole   |Beck      |1538689251000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1538699812000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1538704232000|Logged In|
+|54    |Downgrade|Alexi    |Warren    |1538718829000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538720551000|Logged In|
+|124   |Downgrade|Nicole   |Beck      |1538726395000|Logged In|
+|105   |Downgrade|Alexander|Garcia    |1538729791000|Logged In|
+|54    |Downgrade|Alexi    |Warren    |1538730233000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538731583000|Logged In|
+|59    |Downgrade|Jaleel   |Maldonado |1538736844000|Logged In|
+|105   |Downgrade|Alexander|Garcia    |1538742669000|Logged In|
+|58    |Downgrade|Erick    |Brooks    |1538743518000|Logged In|
+|59    |Downgrade|Jaleel   |Maldonado |1538744806000|Logged In|
+|105   |Downgrade|Alexander|Garcia    |1538747640000|Logged In|
+|18    |Downgrade|Adriel   |Mendoza   |1538749555000|Logged In|
+|124   |Downgrade|Nicole   |Beck      |1538750379000|Logged In|
+|51    |Downgrade|Ethan    |Johnson   |1538754336000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538759859000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538768851000|Logged In|
+|54    |Downgrade|Alexi    |Warren    |1538779867000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538781886000|Logged In|
+|51    |Downgrade|Ethan    |Johnson   |1538782689000|Logged In|
+|92    |Downgrade|Riley    |Taylor    |1538790891000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538796726000|Logged In|
+|140   |Downgrade|Lucero   |Reed      |1538801289000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538821438000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538825304000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538832855000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538832860000|Logged In|
+|142   |Downgrade|Grant    |Flores    |1538834789000|Logged In|
+|141   |Downgrade|Kaylenn  |Jenkins   |1538835478000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538840175000|Logged In|
+|54    |Downgrade|Alexi    |Warren    |1538840578000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538846076000|Logged In|
+|6     |Downgrade|Bryson   |Roberson  |1538846532000|Logged In|
+|142   |Downgrade|Grant    |Flores    |1538846752000|Logged In|
+|142   |Downgrade|Grant    |Flores    |1538846820000|Logged In|
+|15    |Downgrade|Panav    |Myers     |1538847652000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538847978000|Logged In|
+|54    |Downgrade|Alexi    |Warren    |1538848384000|Logged In|
+|15    |Downgrade|Panav    |Myers     |1538854403000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538860208000|Logged In|
+|6     |Downgrade|Bryson   |Roberson  |1538860654000|Logged In|
+|15    |Downgrade|Panav    |Myers     |1538861063000|Logged In|
+|115   |Downgrade|Lina     |Francis   |1538877034000|Logged In|
+|129   |Downgrade|Davis    |Wang      |1538896047000|Logged In|
+|142   |Downgrade|Grant    |Flores    |1538896277000|Logged In|
+|142   |Downgrade|Grant    |Flores    |1538900684000|Logged In|
+|9     |Downgrade|Micah    |Long      |1538903551000|Logged In|
+|129   |Downgrade|Davis    |Wang      |1538911363000|Logged In|
+|129   |Downgrade|Davis    |Wang      |1538923089000|Logged In|
+|9     |Downgrade|Micah    |Long      |1538924565000|Logged In|
+|42    |Downgrade|Dillyn   |Richardson|1538926570000|Logged In|
+|42    |Downgrade|Dillyn   |Richardson|1538930863000|Logged In|
+|58    |Downgrade|Erick    |Brooks    |1538930932000|Logged In|
+|58    |Downgrade|Erick    |Brooks    |1538931819000|Logged In|
+|18    |Downgrade|Adriel   |Mendoza   |1538935253000|Logged In|
+|9     |Downgrade|Micah    |Long      |1538936534000|Logged In|
+|42    |Downgrade|Dillyn   |Richardson|1538938954000|Logged In|
+|18    |Downgrade|Adriel   |Mendoza   |1538943739000|Logged In|
+|42    |Downgrade|Dillyn   |Richardson|1538945621000|Logged In|
+|30    |Downgrade|Colin    |Freeman   |1538953526000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1538963597000|Logged In|
+|2     |Downgrade|Natalee  |Charles   |1538976932000|Logged In|
+|30    |Downgrade|Colin    |Freeman   |1538994201000|Logged In|
+|30    |Downgrade|Colin    |Freeman   |1538995453000|Logged In|
+|20    |Downgrade|Destiny  |Herring   |1538997355000|Logged In|
+|51    |Downgrade|Ethan    |Johnson   |1538998271000|Logged In|
+|51    |Downgrade|Ethan    |Johnson   |1538998305000|Logged In|
+|95    |Downgrade|Faigy    |Howe      |1538998993000|Logged In|
+|2     |Downgrade|Natalee  |Charles   |1539003245000|Logged In|
+|42    |Downgrade|Dillyn   |Richardson|1539006840000|Logged In|
+|129   |Downgrade|Davis    |Wang      |1539010046000|Logged In|
+|120   |Downgrade|Elizabeth|Washington|1539010638000|Logged In|
+|120   |Downgrade|Elizabeth|Washington|1539010646000|Logged In|
+|2     |Downgrade|Natalee  |Charles   |1539011575000|Logged In|
+|15    |Downgrade|Panav    |Myers     |1539013559000|Logged In|
+|15    |Downgrade|Panav    |Myers     |1539013617000|Logged In|
+|15    |Downgrade|Panav    |Myers     |1539017296000|Logged In|
+|12    |Downgrade|Sophia   |Perry     |1539019797000|Logged In|
+|15    |Downgrade|Panav    |Myers     |1539020220000|Logged In|
+|42    |Downgrade|Dillyn   |Richardson|1539023654000|Logged In|
+|42    |Downgrade|Dillyn   |Richardson|1539024255000|Logged In|
+|2     |Downgrade|Natalee  |Charles   |1539024983000|Logged In|
+|2     |Downgrade|Natalee  |Charles   |1539028806000|Logged In|
+|124   |Downgrade|Nicole   |Beck      |1539029954000|Logged In|
+|32    |Downgrade|Diego    |Mckee     |1539030302000|Logged In|
+|32    |Downgrade|Diego    |Mckee     |1539033030000|Logged In|
+|15    |Downgrade|Panav    |Myers     |1539033631000|Logged In|
+|120   |Downgrade|Elizabeth|Washington|1539036744000|Logged In|
+|127   |Downgrade|Aurora   |Humphrey  |1539040808000|Logged In|
+|95    |Downgrade|Faigy    |Howe      |1539041095000|Logged In|
+|124   |Downgrade|Nicole   |Beck      |1539041330000|Logged In|
+|58    |Downgrade|Erick    |Brooks    |1539041644000|Logged In|
+|124   |Downgrade|Nicole   |Beck      |1539041720000|Logged In|
+|12    |Downgrade|Sophia   |Perry     |1539044571000|Logged In|
+|2     |Downgrade|Natalee  |Charles   |1539052721000|Logged In|
+|29    |Downgrade|Kaleb    |Thompson  |1539071852000|Logged In|
+|39    |Downgrade|Payton   |Campbell  |1539089716000|Logged In|
+|58    |Downgrade|Erick    |Brooks    |1539092901000|Logged In|
+|62    |Downgrade|Saul     |Johnson   |1539095515000|Logged In|
+|54    |Downgrade|Alexi    |Warren    |1539099486000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1539102907000|Logged In|
+|100   |Downgrade|Colin    |Larson    |1539114063000|Logged In|
+|100   |Downgrade|Colin    |Larson    |1539114506000|Logged In|
+|19    |Downgrade|Isabella |Randall   |1539115776000|Logged In|
+|19    |Downgrade|Isabella |Randall   |1539116700000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1539118744000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1539118909000|Logged In|
+|109   |Downgrade|Casey    |Ramirez   |1539121062000|Logged In|
+|109   |Downgrade|Casey    |Ramirez   |1539122293000|Logged In|
+|109   |Downgrade|Casey    |Ramirez   |1539122500000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1539129258000|Logged In|
+|100   |Downgrade|Colin    |Larson    |1539129551000|Logged In|
+|100   |Downgrade|Colin    |Larson    |1539129788000|Logged In|
+|54    |Downgrade|Alexi    |Warren    |1539132494000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1539135879000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1539136016000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1539136605000|Logged In|
+|100   |Downgrade|Colin    |Larson    |1539136946000|Logged In|
+|39    |Downgrade|Payton   |Campbell  |1539141885000|Logged In|
+|77    |Downgrade|Autumn   |Martin    |1539143191000|Logged In|
+|12    |Downgrade|Sophia   |Perry     |1539144046000|Logged In|
+|140   |Downgrade|Lucero   |Reed      |1539147377000|Logged In|
+|77    |Downgrade|Autumn   |Martin    |1539149526000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1539154923000|Logged In|
+|140   |Downgrade|Lucero   |Reed      |1539155289000|Logged In|
+|142   |Downgrade|Grant    |Flores    |1539160720000|Logged In|
+|61    |Downgrade|Parker   |Williams  |1539161532000|Logged In|
+|95    |Downgrade|Faigy    |Howe      |1539161781000|Logged In|
+|95    |Downgrade|Faigy    |Howe      |1539161797000|Logged In|
+|95    |Downgrade|Faigy    |Howe      |1539168830000|Logged In|
+|61    |Downgrade|Parker   |Williams  |1539170891000|Logged In|
+|17    |Downgrade|Kayla    |Johnson   |1539171080000|Logged In|
+|131   |Downgrade|Kael     |Baker     |1539174018000|Logged In|
+|140   |Downgrade|Lucero   |Reed      |1539176418000|Logged In|
+|95    |Downgrade|Faigy    |Howe      |1539177808000|Logged In|
+|33    |Downgrade|Deegan   |Robinson  |1539181854000|Logged In|
+|95    |Downgrade|Faigy    |Howe      |1539183933000|Logged In|
+|6     |Downgrade|Bryson   |Roberson  |1539185358000|Logged In|
+|65    |Downgrade|Spencer  |Gonzalez  |1539188942000|Logged In|
+|42    |Downgrade|Dillyn   |Richardson|1539189120000|Logged In|
+|6     |Downgrade|Bryson   |Roberson  |1539190534000|Logged In|
+|6     |Downgrade|Bryson   |Roberson  |1539193018000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1539195974000|Logged In|
+|65    |Downgrade|Spencer  |Gonzalez  |1539196056000|Logged In|
+|17    |Downgrade|Kayla    |Johnson   |1539196195000|Logged In|
+|140   |Downgrade|Lucero   |Reed      |1539197311000|Logged In|
+|100   |Downgrade|Colin    |Larson    |1539197897000|Logged In|
+|81    |Downgrade|Oliver   |Gilbert   |1539198701000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1539200476000|Logged In|
+|61    |Downgrade|Parker   |Williams  |1539200721000|Logged In|
+|17    |Downgrade|Kayla    |Johnson   |1539204767000|Logged In|
+|140   |Downgrade|Lucero   |Reed      |1539207016000|Logged In|
+|120   |Downgrade|Elizabeth|Washington|1539210426000|Logged In|
+|142   |Downgrade|Grant    |Flores    |1539211414000|Logged In|
+|51    |Downgrade|Ethan    |Johnson   |1539212680000|Logged In|
+|54    |Downgrade|Alexi    |Warren    |1539215080000|Logged In|
+|85    |Downgrade|Brayden  |Thomas    |1539216604000|Logged In|
+|85    |Downgrade|Brayden  |Thomas    |1539220825000|Logged In|
+|17    |Downgrade|Kayla    |Johnson   |1539221809000|Logged In|
+|142   |Downgrade|Grant    |Flores    |1539222044000|Logged In|
+|120   |Downgrade|Elizabeth|Washington|1539222995000|Logged In|
+|61    |Downgrade|Parker   |Williams  |1539225402000|Logged In|
+|81    |Downgrade|Oliver   |Gilbert   |1539225986000|Logged In|
+|81    |Downgrade|Oliver   |Gilbert   |1539226266000|Logged In|
+|54    |Downgrade|Alexi    |Warren    |1539234164000|Logged In|
+|17    |Downgrade|Kayla    |Johnson   |1539239457000|Logged In|
+|11    |Downgrade|Zoe      |Patel     |1539239741000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1539243974000|Logged In|
+|61    |Downgrade|Parker   |Williams  |1539244187000|Logged In|
+|101   |Downgrade|Alex     |Hogan     |1539253069000|Logged In|
+|51    |Downgrade|Ethan    |Johnson   |1539263189000|Logged In|
+|81    |Downgrade|Oliver   |Gilbert   |1539264336000|Logged In|
++------+---------+---------+----------+-------------+---------+
+only showing top 225 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[227]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Distribution of users downgrades</span>
+<span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s1">&#39;userId&#39;</span><span class="p">,</span> <span class="s1">&#39;downgraded&#39;</span><span class="p">])</span>\
     <span class="o">.</span><span class="n">groupBy</span><span class="p">(</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>\
-    <span class="o">.</span><span class="n">withColumnRenamed</span><span class="p">(</span><span class="s1">&#39;sum(downgraded)&#39;</span><span class="p">,</span> <span class="s1">&#39;downgraded&#39;</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">withColumnRenamed</span><span class="p">(</span><span class="s1">&#39;sum(downgraded)&#39;</span><span class="p">,</span> <span class="s1">&#39;downgraded&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+-------+------------------+------------------+
+|summary|            userId|        downgraded|
++-------+------------------+------------------+
+|  count|               225|               225|
+|   mean|65391.013333333336|              0.28|
+| stddev|105396.47791907164|0.5876709477736184|
+|    min|                10|                 0|
+|    max|                99|                 3|
++-------+------------------+------------------+
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[228]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Distribution of users cancellations</span>
+<span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s1">&#39;userId&#39;</span><span class="p">,</span><span class="s1">&#39;cancelled&#39;</span><span class="p">])</span>\
+    <span class="o">.</span><span class="n">groupBy</span><span class="p">(</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>\
     <span class="o">.</span><span class="n">withColumnRenamed</span><span class="p">(</span><span class="s1">&#39;sum(cancelled)&#39;</span><span class="p">,</span> <span class="s1">&#39;cancelled&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 
@@ -13474,15 +14601,15 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>+-------+------------------+------------------+------------------+
-|summary|            userId|        downgraded|         cancelled|
-+-------+------------------+------------------+------------------+
-|  count|               225|               225|               225|
-|   mean|65391.013333333336|              0.28|0.2311111111111111|
-| stddev|105396.47791907164|0.5876709477736184|0.4224832108996327|
-|    min|                10|                 0|                 0|
-|    max|                99|                 3|                 1|
-+-------+------------------+------------------+------------------+
+<pre>+-------+------------------+------------------+
+|summary|            userId|         cancelled|
++-------+------------------+------------------+
+|  count|               225|               225|
+|   mean|65391.013333333336|0.2311111111111111|
+| stddev|105396.47791907164|0.4224832108996327|
+|    min|                10|                 0|
+|    max|                99|                 1|
++-------+------------------+------------------+
 
 </pre>
 </div>
@@ -13494,7 +14621,41 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[229]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># How much users those who downgraded and cancell their subscriptions% </span>
+<span class="n">down_cancel</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">cancel_reg_ids</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">((</span><span class="nb">set</span><span class="p">(</span><span class="n">downgrade_reg_ids</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{0:.2f}% o</span><span class="s1">f customers who downgraded have also cancelled their subscriptions&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="mi">100</span><span class="o">*</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">down_cancel</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">downgrade_reg_ids</span><span class="p">))))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>22.73% of customers who downgraded have also cancelled their subscriptions
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[230]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">windowvalue</span> <span class="o">=</span> <span class="n">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="s2">&quot;userId&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="s2">&quot;ts&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">rangeBetween</span><span class="p">(</span><span class="n">Window</span><span class="o">.</span><span class="n">unboundedPreceding</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -13509,7 +14670,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[231]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">get_day</span> <span class="o">=</span> <span class="n">udf</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="mi">1000</span><span class="p">),</span> <span class="n">DateType</span><span class="p">())</span>
@@ -13522,7 +14683,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[232]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">song</span><span class="o">=</span><span class="n">udf</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">==</span><span class="s1">&#39;NextSong&#39;</span><span class="p">),</span> <span class="n">IntegerType</span><span class="p">())</span>
@@ -13537,7 +14698,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[233]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Difference in number of songs played between users who churned or not</span>
@@ -13581,7 +14742,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[234]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#number of songs played between home visits</span>
@@ -13637,7 +14798,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[235]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">days</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">86400</span> 
@@ -13652,7 +14813,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[236]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Number of songs played daily</span>
@@ -13707,7 +14868,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[237]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#number of songs couldn&#39;t be played due to errors</span>
@@ -13764,7 +14925,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[238]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Number of times user opted for help</span>
@@ -13821,7 +14982,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="prompt input_prompt">In&nbsp;[239]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Ratio of those who cancelled subscriptions both free and paid</span>
@@ -13854,7 +15015,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="prompt input_prompt">In&nbsp;[240]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Number of users who downgraded &amp; Number of users to cancel</span>
@@ -13887,7 +15048,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[241]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Users who downgraded and then cancelled</span>
@@ -13909,7 +15070,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[21]:</div>
+    <div class="prompt output_prompt">Out[241]:</div>
 
 
 
@@ -13926,7 +15087,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="prompt input_prompt">In&nbsp;[242]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Number of users to cancel who downgrade</span>
@@ -13948,7 +15109,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[22]:</div>
+    <div class="prompt output_prompt">Out[242]:</div>
 
 
 
@@ -13965,7 +15126,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="prompt input_prompt">In&nbsp;[243]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Number of paid users to drop without downgrading</span>
@@ -13998,7 +15159,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="prompt input_prompt">In&nbsp;[244]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Those who churn or not have different listening habits?</span>
@@ -14056,7 +15217,21 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="prompt input_prompt">In&nbsp;[245]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Load data</span>
+<span class="n">data_frame</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="s1">&#39;mini_sparkify_event_data.json&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[246]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Remov duplicate and return user</span>
@@ -14071,7 +15246,65 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="prompt input_prompt">In&nbsp;[247]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Lstdown the userId to merge onto</span>
+<span class="n">users</span> <span class="o">=</span> <span class="n">user_info</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span>
+<span class="n">users</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+
+|userId|
++------+
+|100010|
+|200002|
+|   125|
+|    51|
+|   124|
+|     7|
+|    54|
+|    15|
+|   155|
+|   132|
+|   154|
+|100014|
+|   101|
+|    11|
+|   138|
+|300017|
+|    29|
+|    69|
+|100021|
+|    42|
++------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[248]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Return average thumbs up </span>
@@ -14090,7 +15323,81 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="prompt input_prompt">In&nbsp;[249]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Define windows</span>
+<span class="n">windowval</span> <span class="o">=</span> <span class="n">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="s2">&quot;userId&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="s2">&quot;ts&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">rangeBetween</span><span class="p">(</span><span class="n">Window</span><span class="o">.</span><span class="n">unboundedPreceding</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="c1">#session = Window.partitionBy(&quot;userId&quot;, &quot;sessionId&quot;).orderBy(desc(&quot;ts&quot;))</span>
+<span class="n">daywindow</span> <span class="o">=</span> <span class="n">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="s1">&#39;userId&#39;</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="s1">&#39;ts&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">rangeBetween</span><span class="p">(</span><span class="n">Window</span><span class="o">.</span><span class="n">unboundedPreceding</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[250]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Average Thumb Up</span>
+<span class="n">avg_thumbs_up</span> <span class="o">=</span> <span class="n">average_thumbs_up</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span>
+<span class="n">avg_thumbs_up</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+------------------+
+|userId|       avgThumbsUp|
++------+------------------+
+|200002|               3.0|
+|100010|2.8333333333333335|
+|    51| 8.333333333333334|
+|   124| 5.896551724137931|
+|     7|              1.75|
+|    15|               5.4|
+|    54| 6.037037037037037|
+|   155| 8.285714285714286|
+|   132| 5.333333333333333|
+|100014|               3.4|
+|   154|3.6666666666666665|
+|    11| 2.857142857142857|
+|   101| 7.818181818181818|
+|300017| 7.046511627906977|
+|   138|            5.9375|
+|    29|              6.16|
+|    69|               6.0|
+|100021|              2.75|
+|    42| 4.256410256410256|
+|   112|               1.5|
++------+------------------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[251]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Return average thumbs down</span>
@@ -14111,7 +15418,65 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="prompt input_prompt">In&nbsp;[252]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Average Thumbs Down</span>
+<span class="n">avg_thumbs_down</span> <span class="o">=</span> <span class="n">average_thumbs_down</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span>
+<span class="n">avg_thumbs_down</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+------------------+
+|userId|     avgThumbsDown|
++------+------------------+
+|100010|              1.25|
+|200002|               3.0|
+|   124|1.8636363636363635|
+|    51|               2.1|
+|     7|               1.0|
+|    15|               1.4|
+|    54|1.5263157894736843|
+|   155|               1.0|
+|   132|               1.7|
+|100014|               1.0|
+|    11|1.2857142857142858|
+|   101|2.2857142857142856|
+|300017|1.6470588235294117|
+|   138|2.6666666666666665|
+|    29|1.4666666666666666|
+|    69|               1.5|
+|100021|1.6666666666666667|
+|    42|1.1904761904761905|
+|   112|               1.5|
+|    87|               1.0|
++------+------------------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[253]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Return number of friends</span>
@@ -14128,7 +15493,65 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[29]:</div>
+<div class="prompt input_prompt">In&nbsp;[254]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Number of Friends</span>
+<span class="n">num_friends</span> <span class="o">=</span> <span class="n">number_of_friends</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span>
+<span class="n">num_friends</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+----------+
+|userId|numFriends|
++------+----------+
+|100010|         4|
+|200002|         4|
+|    51|        28|
+|   124|        74|
+|     7|         1|
+|    54|        33|
+|    15|        31|
+|   155|        11|
+|   132|        41|
+|   154|         3|
+|100014|         6|
+|   101|        29|
+|    11|         6|
+|   138|        41|
+|300017|        63|
+|    29|        47|
+|    69|        12|
+|100021|         7|
+|    42|        52|
+|   112|         7|
++------+----------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[255]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Return skipped attributes</span>
@@ -14158,7 +15581,65 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[30]:</div>
+<div class="prompt input_prompt">In&nbsp;[256]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Average timeSkiped skipRate</span>
+<span class="n">skipping</span> <span class="o">=</span> <span class="n">skipp_attributes</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span>
+<span class="n">skipping</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+--------------+--------+
+|userId|avgTimeSkipped|skipRate|
++------+--------------+--------+
+|100010|           0.0|     0.0|
+|200002|           0.0|     0.0|
+|   125|           0.0|     0.0|
+|    51|           0.0|     0.0|
+|   124|           0.0|     0.0|
+|     7|           0.0|     0.0|
+|    54|           0.0|     0.0|
+|    15|           0.0|     0.0|
+|   155|           0.0|     0.0|
+|100014|           0.0|     0.0|
+|   132|           0.0|     0.0|
+|   154|           0.0|     0.0|
+|   101|           0.0|     0.0|
+|    11|           0.0|     0.0|
+|300017|           0.0|     0.0|
+|   138|           0.0|     0.0|
+|    29|           0.0|     0.0|
+|    69|           0.0|     0.0|
+|100021|           0.0|     0.0|
+|    42|           0.0|     0.0|
++------+--------------+--------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[257]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Return who all are regular visiter of help site</span>
@@ -14180,7 +15661,65 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[31]:</div>
+<div class="prompt input_prompt">In&nbsp;[258]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Avg daily visits to help site</span>
+<span class="n">daily_help_visit</span> <span class="o">=</span> <span class="n">daily_visit_help_site</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span>
+<span class="n">daily_help_visit</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+------------------+
+|userId|   dailyHelpVisits|
++------+------------------+
+|100010|               1.0|
+|200002|               1.0|
+|   124|            1.4375|
+|     7|               1.0|
+|    51|1.7142857142857142|
+|    54|1.1333333333333333|
+|    15|1.1428571428571428|
+|   155|               1.8|
+|   132|1.7777777777777777|
+|100014|               1.0|
+|   154|               1.0|
+|   101|1.7142857142857142|
+|    11|               1.5|
+|300017|              1.35|
+|   138|1.8571428571428572|
+|    29|1.5555555555555556|
+|    69|2.3333333333333335|
+|    42|1.1764705882352942|
+|   112|               1.0|
+|    87|               1.6|
++------+------------------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[259]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Return daily error</span>
@@ -14201,7 +15740,65 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[32]:</div>
+<div class="prompt input_prompt">In&nbsp;[260]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Shows daily error</span>
+<span class="n">daily_errors</span> <span class="o">=</span> <span class="n">get_daily_error</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span>
+<span class="n">daily_errors</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+------------------+
+|userId|       dailyErrors|
++------+------------------+
+|   124|               1.2|
+|     7|               1.0|
+|    51|               1.0|
+|    15|               1.0|
+|    54|               1.0|
+|   155|               1.0|
+|   132|               1.0|
+|   101|               1.5|
+|    11|               1.0|
+|300017|              1.25|
+|   138|               1.0|
+|    69|1.3333333333333333|
+|100021|               1.0|
+|    42|               1.0|
+|    73|               1.0|
+|200010|               1.0|
+|   113|               1.0|
+|    30|               1.0|
+|    59|               2.0|
+|   139|               1.0|
++------+------------------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[261]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Return churn</span>
@@ -14233,7 +15830,65 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[33]:</div>
+<div class="prompt input_prompt">In&nbsp;[262]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Whether a user has downgraded</span>
+<span class="n">churn</span> <span class="o">=</span> <span class="n">churn_user</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span>
+<span class="n">churn</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+----------+---------+--------------+-----------------+
+|userId|downgraded|cancelled|visited_cancel|visited_downgrade|
++------+----------+---------+--------------+-----------------+
+|100010|         0|        0|             0|                0|
+|200002|         0|        0|             0|                5|
+|   125|         0|        1|             1|                0|
+|    51|         0|        1|             1|               23|
+|   124|         0|        0|             0|               41|
+|     7|         0|        0|             0|                0|
+|    54|         1|        1|             1|               39|
+|    15|         0|        0|             0|               28|
+|   155|         0|        0|             0|               12|
+|   132|         0|        0|             0|               19|
+|   154|         0|        0|             0|                0|
+|100014|         0|        1|             1|                3|
+|   101|         0|        1|             1|               22|
+|    11|         1|        0|             0|                5|
+|   138|         0|        0|             0|               21|
+|300017|         0|        0|             0|               25|
+|    29|         0|        1|             1|               18|
+|    69|         0|        0|             0|                9|
+|100021|         0|        1|             1|                0|
+|    42|         0|        0|             0|               37|
++------+----------+---------+--------------+-----------------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[263]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Return user level</span>
@@ -14256,7 +15911,65 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[34]:</div>
+<div class="prompt input_prompt">In&nbsp;[264]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#shows use categories</span>
+<span class="n">user_level</span> <span class="o">=</span> <span class="n">get_user_level</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span>
+<span class="n">user_level</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+----+----+
+|userId|free|paid|
++------+----+----+
+|100021|   1|   0|
+|200021|   1|   0|
+|200001|   1|   0|
+|     6|   1|   0|
+|300022|   0|   1|
+|   132|   1|   0|
+|   112|   1|   0|
+|    79|   1|   0|
+|200008|   1|   0|
+|    16|   0|   1|
+|200007|   0|   1|
+|300015|   1|   0|
+|    39|   1|   0|
+|300014|   0|   1|
+|    61|   1|   0|
+|    56|   0|   1|
+|300014|   1|   0|
+|   100|   0|   1|
+|300024|   0|   1|
+|300023|   0|   1|
++------+----+----+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[265]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Return cusum</span>
@@ -14277,7 +15990,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[35]:</div>
+<div class="prompt input_prompt">In&nbsp;[266]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Return average songs till home</span>
@@ -14296,104 +16009,225 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[36]:</div>
+<div class="prompt input_prompt">In&nbsp;[267]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">feature_engineering</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Create necessary features to use machine learning algorithms.</span>
-<span class="sd">    First loads data set from file</span>
-<span class="sd">    </span>
-<span class="sd">    Resulting DF Strucutre:    </span>
-<span class="sd">    root</span>
-<span class="sd">     |-- userId: string</span>
-<span class="sd">     |-- downgraded: long</span>
-<span class="sd">     |-- cancelled: long</span>
-<span class="sd">     |-- visited_cancel: long</span>
-<span class="sd">     |-- visited_downgrade: long</span>
-<span class="sd">     |-- dailyHelpVisits: double</span>
-<span class="sd">     |-- dailyErrors: double</span>
-<span class="sd">     |-- free: integer</span>
-<span class="sd">     |-- paid: integer</span>
-<span class="sd">     |-- avgThumbsUp: double</span>
-<span class="sd">     |-- avgThumbsDOwn: double</span>
-<span class="sd">     |-- numFriends: long</span>
-<span class="sd">     |-- avgSongsTillHome: double</span>
-<span class="sd">     |-- avgTimeSkipped: double</span>
-<span class="sd">     |-- skipRate: double</span>
-<span class="sd">    </span>
-<span class="sd">    Inputs:</span>
-<span class="sd">        filepath - path to json dataset on file</span>
-<span class="sd">        </span>
-<span class="sd">    Outputs:</span>
-<span class="sd">        data - engineered dataset</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="c1">#Dataframe of user ids to merge onto</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">json</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
-    <span class="n">users</span> <span class="o">=</span> <span class="n">user_info</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-       
-    <span class="c1">#Define windows</span>
-    <span class="n">windowval</span> <span class="o">=</span> <span class="n">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="s2">&quot;userId&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="s2">&quot;ts&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">rangeBetween</span><span class="p">(</span><span class="n">Window</span><span class="o">.</span><span class="n">unboundedPreceding</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="c1">#session = Window.partitionBy(&quot;userId&quot;, &quot;sessionId&quot;).orderBy(desc(&quot;ts&quot;))</span>
-    <span class="n">daywindow</span> <span class="o">=</span> <span class="n">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="s1">&#39;userId&#39;</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="s1">&#39;ts&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">rangeBetween</span><span class="p">(</span><span class="n">Window</span><span class="o">.</span><span class="n">unboundedPreceding</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
-    <span class="n">avg_thumbs_up</span> <span class="o">=</span> <span class="n">average_thumbs_up</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    
-    <span class="n">avg_thumbs_down</span> <span class="o">=</span> <span class="n">average_thumbs_down</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    
-    <span class="n">num_friends</span> <span class="o">=</span> <span class="n">number_of_friends</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Process to calculate skipping variables</span>
-
-<span class="sd">    1. Dont include thumbs up and down pages because that usually occurs </span>
-<span class="sd">       while playing and does not change song</span>
-<span class="sd">    2. Create variable for if action is song</span>
-<span class="sd">    3. Check if next action is song - this will check to see if someone is </span>
-<span class="sd">       skipping song or just leaving page</span>
-<span class="sd">    4. Get the difference in timestamp for next action song playing</span>
-<span class="sd">    5. Subtract the difference in timestamp from song length to see </span>
-<span class="sd">       how much of song was skipped</span>
-<span class="sd">    6. Get descriptive stats</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-
-    <span class="n">skipping</span> <span class="o">=</span> <span class="n">skipp_attributes</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    
-    <span class="c1">#Avg daily visits to help site</span>
-    <span class="n">daily_help_visit</span> <span class="o">=</span> <span class="n">daily_visit_help_site</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-
-    <span class="n">daily_errors</span> <span class="o">=</span> <span class="n">get_daily_error</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    
-    <span class="c1">#Whether a user has downgraded</span>
-    <span class="n">churn</span> <span class="o">=</span> <span class="n">churn_user</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-
-    <span class="n">user_level</span> <span class="o">=</span> <span class="n">get_user_level</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-
-    <span class="n">cusum</span> <span class="o">=</span> <span class="n">get_cusum</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-    
-    <span class="n">avg_songs_till_home</span> <span class="o">=</span> <span class="n">average_songs_till_home</span><span class="p">(</span><span class="n">cusum</span><span class="p">)</span>
-    
-    <span class="n">df</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">churn</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
-        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">daily_help_visit</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
-        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">daily_errors</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
-        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">user_level</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
-        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">avg_thumbs_up</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
-        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">avg_thumbs_down</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
-        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">num_friends</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
-        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">avg_songs_till_home</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
-        <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">skipping</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>
-    
-    <span class="k">return</span> <span class="n">df</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Average songs till in home page</span>
+<span class="n">cusum</span> <span class="o">=</span> <span class="n">get_cusum</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span>
+<span class="n">avg_songs_till_home</span> <span class="o">=</span> <span class="n">average_songs_till_home</span><span class="p">(</span><span class="n">cusum</span><span class="p">)</span>
+<span class="n">avg_songs_till_home</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 
     </div>
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+------------------+
+|userId|  avgSongsTillHome|
++------+------------------+
+|100010|22.916666666666668|
+|200002|             19.35|
+|   125|               8.0|
+|   124|  24.4251497005988|
+|    51|29.319444444444443|
+|     7|13.636363636363637|
+|    15|21.266666666666666|
+|    54| 24.92105263157895|
+|   155|29.285714285714285|
+|100014|            32.125|
+|   132| 24.71794871794872|
+|   154|              14.0|
+|   101|24.958333333333332|
+|    11|17.486486486486488|
+|   138|30.895522388059703|
+|300017| 24.54054054054054|
+|100021|            14.375|
+|    29|25.233333333333334|
+|    69|           23.4375|
+|   112| 16.53846153846154|
++------+------------------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[37]:</div>
+<div class="prompt input_prompt">In&nbsp;[268]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Create necessary features to use machine learning algorithms    </span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">churn</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">daily_help_visit</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">daily_errors</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">user_level</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">avg_thumbs_up</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">avg_thumbs_down</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">num_friends</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">avg_songs_till_home</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">skipping</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;userId&#39;</span><span class="p">)</span> 
+<span class="n">df</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>+------+----------+---------+--------------+-----------------+------------------+------------------+----+----+-----------------+------------------+----------+------------------+--------------+--------+
+|userId|downgraded|cancelled|visited_cancel|visited_downgrade|   dailyHelpVisits|       dailyErrors|free|paid|      avgThumbsUp|     avgThumbsDown|numFriends|  avgSongsTillHome|avgTimeSkipped|skipRate|
++------+----------+---------+--------------+-----------------+------------------+------------------+----+----+-----------------+------------------+----------+------------------+--------------+--------+
+|   124|         0|        0|             0|               41|            1.4375|               1.2|   0|   1|5.896551724137931|1.8636363636363635|        74|  24.4251497005988|           0.0|     0.0|
+|    51|         0|        1|             1|               23|1.7142857142857142|               1.0|   0|   1|8.333333333333334|               2.1|        28|29.319444444444443|           0.0|     0.0|
+|     7|         0|        0|             0|                0|               1.0|               1.0|   1|   0|             1.75|               1.0|         1|13.636363636363637|           0.0|     0.0|
+|    15|         0|        0|             0|               28|1.1428571428571428|               1.0|   0|   1|              5.4|               1.4|        31|21.266666666666666|           0.0|     0.0|
+|    54|         1|        1|             1|               39|1.1333333333333333|               1.0|   1|   0|6.037037037037037|1.5263157894736843|        33| 24.92105263157895|           0.0|     0.0|
+|    54|         1|        1|             1|               39|1.1333333333333333|               1.0|   0|   1|6.037037037037037|1.5263157894736843|        33| 24.92105263157895|           0.0|     0.0|
+|   155|         0|        0|             0|               12|               1.8|               1.0|   1|   0|8.285714285714286|               1.0|        11|29.285714285714285|           0.0|     0.0|
+|   155|         0|        0|             0|               12|               1.8|               1.0|   0|   1|8.285714285714286|               1.0|        11|29.285714285714285|           0.0|     0.0|
+|   132|         0|        0|             0|               19|1.7777777777777777|               1.0|   1|   0|5.333333333333333|               1.7|        41| 24.71794871794872|           0.0|     0.0|
+|   132|         0|        0|             0|               19|1.7777777777777777|               1.0|   0|   1|5.333333333333333|               1.7|        41| 24.71794871794872|           0.0|     0.0|
+|   101|         0|        1|             1|               22|1.7142857142857142|               1.5|   1|   0|7.818181818181818|2.2857142857142856|        29|24.958333333333332|           0.0|     0.0|
+|   101|         0|        1|             1|               22|1.7142857142857142|               1.5|   0|   1|7.818181818181818|2.2857142857142856|        29|24.958333333333332|           0.0|     0.0|
+|    11|         1|        0|             0|                5|               1.5|               1.0|   1|   0|2.857142857142857|1.2857142857142858|         6|17.486486486486488|           0.0|     0.0|
+|    11|         1|        0|             0|                5|               1.5|               1.0|   0|   1|2.857142857142857|1.2857142857142858|         6|17.486486486486488|           0.0|     0.0|
+|   138|         0|        0|             0|               21|1.8571428571428572|               1.0|   1|   0|           5.9375|2.6666666666666665|        41|30.895522388059703|           0.0|     0.0|
+|   138|         0|        0|             0|               21|1.8571428571428572|               1.0|   0|   1|           5.9375|2.6666666666666665|        41|30.895522388059703|           0.0|     0.0|
+|300017|         0|        0|             0|               25|              1.35|              1.25|   0|   1|7.046511627906977|1.6470588235294117|        63| 24.54054054054054|           0.0|     0.0|
+|    69|         0|        0|             0|                9|2.3333333333333335|1.3333333333333333|   1|   0|              6.0|               1.5|        12|           23.4375|           0.0|     0.0|
+|    69|         0|        0|             0|                9|2.3333333333333335|1.3333333333333333|   0|   1|              6.0|               1.5|        12|           23.4375|           0.0|     0.0|
+|    42|         0|        0|             0|               37|1.1764705882352942|               1.0|   1|   0|4.256410256410256|1.1904761904761905|        52|21.786585365853657|           0.0|     0.0|
++------+----------+---------+--------------+-----------------+------------------+------------------+----+----+-----------------+------------------+----------+------------------+--------------+--------+
+only showing top 20 rows
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[269]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">printSchema</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>root
+ |-- userId: string (nullable = true)
+ |-- downgraded: long (nullable = true)
+ |-- cancelled: long (nullable = true)
+ |-- visited_cancel: long (nullable = true)
+ |-- visited_downgrade: long (nullable = true)
+ |-- dailyHelpVisits: double (nullable = true)
+ |-- dailyErrors: double (nullable = true)
+ |-- free: integer (nullable = true)
+ |-- paid: integer (nullable = true)
+ |-- avgThumbsUp: double (nullable = true)
+ |-- avgThumbsDown: double (nullable = true)
+ |-- numFriends: long (nullable = false)
+ |-- avgSongsTillHome: double (nullable = true)
+ |-- avgTimeSkipped: double (nullable = true)
+ |-- skipRate: double (nullable = true)
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="How-to-create-necessary-features-to-use-machine-learning-algorithms?">How to create necessary features to use machine learning algorithms?<a class="anchor-link" href="#How-to-create-necessary-features-to-use-machine-learning-algorithms?">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In above code segment I have created necessary features to use machine learning algorithms.</p>
+<h4 id="Inputs:">Inputs:<a class="anchor-link" href="#Inputs:">&#182;</a></h4><p>Loads data set from mini_sparkify_event_data.json file</p>
+<h4 id="Outputs:">Outputs:<a class="anchor-link" href="#Outputs:">&#182;</a></h4><p>Engineered dataset for machine learning algorithm</p>
+<h4 id="Resulting-data-frame-Structure:">Resulting data frame Structure:<a class="anchor-link" href="#Resulting-data-frame-Structure:">&#182;</a></h4>
+<pre><code>root
+ |-- userId: string (nullable = true)
+ |-- downgraded: long (nullable = true)
+ |-- cancelled: long (nullable = true)
+ |-- visited_cancel: long (nullable = true)
+ |-- visited_downgrade: long (nullable = true)
+ |-- dailyHelpVisits: double (nullable = true)
+ |-- dailyErrors: double (nullable = true)
+ |-- free: integer (nullable = true)
+ |-- paid: integer (nullable = true)
+ |-- avgThumbsUp: double (nullable = true)
+ |-- avgThumbsDown: double (nullable = true)
+ |-- numFriends: long (nullable = false)
+ |-- avgSongsTillHome: double (nullable = true)
+ |-- avgTimeSkipped: double (nullable = true)
+ |-- skipRate: double (nullable = true)
+
+
+</code></pre>
+<h3 id="Steps-to-prepare-data-set-for-machine-learning-algorithm">Steps to prepare data set for machine learning algorithm<a class="anchor-link" href="#Steps-to-prepare-data-set-for-machine-learning-algorithm">&#182;</a></h3><p>The steps mainly involved to skip attributes which are not necessary to created data set for machine learning algorithm</p>
+<ol>
+<li>Not include thumbs up and down pages because that usually occurs while playing and does not change song</li>
+<li>Create variable for if action is song</li>
+<li>Check if next action is song - this will check to see if someone is skipping song or just leaving page</li>
+<li>Get the difference in timestamp for next action song playing</li>
+<li>Subtract the difference in timestamp from song length to see how much of song was skipped</li>
+<li>Get descriptive stats</li>
+</ol>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[270]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">feature_scaling</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
@@ -14428,11 +16262,11 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[38]:</div>
+<div class="prompt input_prompt">In&nbsp;[271]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data_small</span> <span class="o">=</span> <span class="n">feature_engineering</span><span class="p">(</span><span class="s2">&quot;mini_sparkify_event_data.json&quot;</span><span class="p">)</span>
-<span class="n">data_small</span> <span class="o">=</span> <span class="n">feature_scaling</span><span class="p">(</span><span class="n">data_small</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#data_small = df</span>
+<span class="n">data_small</span> <span class="o">=</span> <span class="n">feature_scaling</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 <span class="n">data_small</span><span class="o">.</span><span class="n">persist</span><span class="p">()</span>
 </pre></div>
 
@@ -14446,7 +16280,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[38]:</div>
+    <div class="prompt output_prompt">Out[271]:</div>
 
 
 
@@ -14463,7 +16297,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[39]:</div>
+<div class="prompt input_prompt">In&nbsp;[272]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">data_small</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -14479,7 +16313,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[39]:</div>
+    <div class="prompt output_prompt">Out[272]:</div>
 
 
 
@@ -14496,7 +16330,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[40]:</div>
+<div class="prompt input_prompt">In&nbsp;[273]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">train</span><span class="p">,</span> <span class="n">rest</span> <span class="o">=</span> <span class="n">data_small</span><span class="o">.</span><span class="n">randomSplit</span><span class="p">([</span><span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">],</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
@@ -14510,7 +16344,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[41]:</div>
+<div class="prompt input_prompt">In&nbsp;[274]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">pr</span> <span class="o">=</span> <span class="n">BinaryClassificationEvaluator</span><span class="p">(</span><span class="n">metricName</span><span class="o">=</span><span class="s1">&#39;areaUnderPR&#39;</span><span class="p">)</span>
@@ -14524,7 +16358,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[42]:</div>
+<div class="prompt input_prompt">In&nbsp;[275]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
@@ -14565,7 +16399,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[43]:</div>
+<div class="prompt input_prompt">In&nbsp;[276]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Random forest classifier model</span>
@@ -14619,7 +16453,7 @@ Random Forest
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[44]:</div>
+<div class="prompt input_prompt">In&nbsp;[277]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Gradient boosted trees (ie ada boost)</span>
@@ -14673,7 +16507,7 @@ Gradient Boosted Trees
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[45]:</div>
+<div class="prompt input_prompt">In&nbsp;[278]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#SVM</span>
@@ -14727,7 +16561,7 @@ Support Vector Machine
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[46]:</div>
+<div class="prompt input_prompt">In&nbsp;[279]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Logistic regression model</span>
@@ -14781,7 +16615,7 @@ Logistic Regression
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[47]:</div>
+<div class="prompt input_prompt">In&nbsp;[280]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Visual check for predictions</span>
@@ -14836,10 +16670,10 @@ Logistic Regression
 +--------------------+--------------------+----------+-----+
 |            features|       rawPrediction|prediction|label|
 +--------------------+--------------------+----------+-----+
-|[0.0,1.0,0.315068...|           [3.0,7.0]|       1.0|  1.0|
-|[0.33333333333333...|[0.68421052631578...|       1.0|  1.0|
-|[0.0,1.0,0.054794...|[0.68421052631578...|       1.0|  1.0|
-|[0.33333333333333...|         [9.98,0.02]|       0.0|  0.0|
+|[0.0,1.0,0.315068...|           [1.0,9.0]|       1.0|  1.0|
+|[0.33333333333333...|[0.76666666666666...|       1.0|  1.0|
+|[0.0,1.0,0.054794...|[1.43333333333333...|       1.0|  1.0|
+|[0.33333333333333...|           [9.0,1.0]|       0.0|  0.0|
 |[0.0,0.0,0.082191...|          [10.0,0.0]|       0.0|  0.0|
 +--------------------+--------------------+----------+-----+
 
@@ -14853,7 +16687,7 @@ Logistic Regression
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[48]:</div>
+<div class="prompt input_prompt">In&nbsp;[281]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Evaluate model</span>
