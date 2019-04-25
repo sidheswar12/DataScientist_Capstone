@@ -6,7 +6,7 @@
 # 
 # You can follow the steps below to guide your data analysis and model building portion of this project.
 
-# In[199]:
+# In[50]:
 
 
 # import libraries
@@ -25,13 +25,15 @@ from pyspark.ml.classification import LogisticRegression, RandomForestClassifier
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 from pyspark.mllib.evaluation import MulticlassMetrics
 import pyspark.sql.functions as psqf
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 # # Load and Clean Dataset
 
 # In this workspace, the mini-dataset file is mini_sparkify_event_data.json. Load and clean the dataset, checking for invalid or missing data - for example, records without userids or sessionids.
 
-# In[200]:
+# In[51]:
 
 
 # Create a Spark session
@@ -40,26 +42,26 @@ spark = SparkSession.builder     .master("local")     .appName("Identify Feature
 df = spark.read.json('mini_sparkify_event_data.json')
 
 
-# In[201]:
+# In[52]:
 
 
 df.show(1)
 
 
-# In[202]:
+# In[53]:
 
 
 # Print schema for future reference
 df.printSchema()
 
 
-# In[203]:
+# In[54]:
 
 
 print(df.take(1))
 
 
-# In[204]:
+# In[55]:
 
 
 total = float(df.count())
@@ -69,7 +71,7 @@ percentage = missing *100.0 /total
 
 # #### Dropping Missing Items : -
 
-# In[205]:
+# In[56]:
 
 
 print(df.count(), len(df.columns))
@@ -86,7 +88,7 @@ for colName, dtype in df.dtypes:
 # 
 # 3. User Agent, registration, first name, last name, location and gender have the same number of missing values.
 
-# In[206]:
+# In[57]:
 
 
 df.filter(df.registration.isNull()).show(1,False)
@@ -98,7 +100,7 @@ print("Number of rows with missing registration, name, gender, location and user
 df = df.filter(df.registration.isNotNull())
 
 
-# In[207]:
+# In[58]:
 
 
 print ("Missing percentage:-",percentage)
@@ -119,7 +121,7 @@ print ("Missing percentage:-",percentage)
 # 3. Uniquely identify a user by user id, so registration number isn't needed
 # 4. All activities of a user will be collected without factoring in timestamp
 
-# In[208]:
+# In[59]:
 
 
 print("Number of rows with missing artist: ", df.filter(df.artist.isNull()).count())
@@ -129,7 +131,7 @@ print("Next song page with missing song: ", df.filter(df.song.isNull() & (df.pag
 print("Song on a different page: ", df.filter(df.song.isNotNull() & (df.page!="NextSong")).count())
 
 
-# In[209]:
+# In[60]:
 
 
 print ("Missing Registration Percentage:-",float(df.filter(df.artist.isNull() & df.song.isNull() & df.length.isNull()).count()*100.0)/total)
@@ -148,7 +150,7 @@ print ("Missing Registration Percentage:-",float(df.filter(df.artist.isNull() & 
 # 17.47% rows do not contain songs but these other pages can be relevant in determining churn so we will use it later, instead of dropping it.
 # 
 
-# In[210]:
+# In[61]:
 
 
 df.groupby('level','page').count().sort('page').show(100,False)
@@ -173,48 +175,48 @@ df.groupby('page','method').count().sort('page','method').show(100,False)
 # ### Explore Data
 # Once you've defined churn, perform some exploratory data analysis to observe the behavior for users who stayed vs users who churned. You can start by exploring aggregates on these two groups of users, observing how much of a specific action they experienced per a certain time unit or number of songs played.
 
-# In[211]:
+# In[62]:
 
 
 # Observation
 df.printSchema()
 
 
-# In[212]:
+# In[63]:
 
 
 # Look at 2 rows for sample
 df.take(1)
 
 
-# In[213]:
+# In[64]:
 
 
 df.select('level').distinct().show()
 
 
-# In[214]:
+# In[65]:
 
 
 level_counts= df.groupby('level').agg({'level':'count'}).withColumnRenamed("count(level)", "level_count")
 level_counts.show()
 
 
-# In[215]:
+# In[66]:
 
 
 page_counts= df.groupby('page').agg({'page':'count'}).withColumnRenamed("count(page)", "page_count")
 page_counts.show()
 
 
-# In[216]:
+# In[67]:
 
 
 level_counts= df.groupby('level').agg({'level':'count'}).withColumnRenamed("count(level)", "level_count")
 level_counts.show()
 
 
-# In[217]:
+# In[68]:
 
 
 #Cancel and Cancellation Confirmation samples in the dataset
@@ -222,7 +224,7 @@ cancel_events = df.filter(psqf.col('page').isin(['Cancel','Cancellation Confirma
 cancel_events.show(5, False)
 
 
-# In[218]:
+# In[69]:
 
 
 churn_event = df.groupby('userId').agg(psqf.collect_list('page').alias('pages'))
@@ -231,14 +233,14 @@ churn_f = psqf.udf(lambda x: 1 if 'Cancel' in set(x) else 0)
 churn_event = churn_event.withColumn("label", churn_f(churn_event.pages)).drop('pages')
 
 
-# In[219]:
+# In[70]:
 
 
 labeled_df  = churn_event.join(df, 'userId')
 labeled_df.show()
 
 
-# In[220]:
+# In[71]:
 
 
 use_level_count = labeled_df.groupby('userId', 'Level', 'label').count()
@@ -257,21 +259,21 @@ plt.ylabel('User Count');
 # 
 # Note: churned - 1 & active - 0
 
-# In[221]:
+# In[72]:
 
 
 # Get number of users
 df.select("userId").dropDuplicates().count()
 
 
-# In[222]:
+# In[73]:
 
 
 # Get number of sessions
 df.select("sessionId").dropDuplicates().count()
 
 
-# In[223]:
+# In[74]:
 
 
 churn = udf(lambda x: int(x=="Cancellation Confirmation"), IntegerType())
@@ -280,21 +282,14 @@ downgrade_churn = udf(lambda x: int(x=="Submit Downgrade"), IntegerType())
 df = df.withColumn("downgraded", downgrade_churn("page")).withColumn("cancelled", churn("page"))
 
 
-# In[224]:
+# In[75]:
 
 
 cancel_reg_ids  = [vv['userID'] for vv in cancel_events.select('userID').collect()]
 print(len(cancel_reg_ids), len(set(cancel_reg_ids)))
 
 
-# In[225]:
-
-
-downgrade_reg_ids = [vv['userID'] for vv in downgrade_events.select('userID').collect()]
-print(len(downgrade_reg_ids), len(set(downgrade_reg_ids)))
-
-
-# In[226]:
+# In[76]:
 
 
 #customer who downgraded
@@ -302,21 +297,28 @@ downgrade_events = df.filter(psqf.col('page').isin(['Downgrade']))
 downgrade_events.select(['userID','page', 'firstName', 'lastName','ts', 'auth']).show(225, False)
 
 
-# In[227]:
+# In[77]:
+
+
+downgrade_reg_ids = [vv['userID'] for vv in downgrade_events.select('userID').collect()]
+print(len(downgrade_reg_ids), len(set(downgrade_reg_ids)))
+
+
+# In[78]:
 
 
 #Distribution of users downgrades
 df.select(['userId', 'downgraded'])    .groupBy('userId').sum()    .withColumnRenamed('sum(downgraded)', 'downgraded').describe().show()
 
 
-# In[228]:
+# In[79]:
 
 
 #Distribution of users cancellations
 df.select(['userId','cancelled'])    .groupBy('userId').sum()    .withColumnRenamed('sum(cancelled)', 'cancelled').describe().show()
 
 
-# In[229]:
+# In[80]:
 
 
 # How much users those who downgraded and cancell their subscriptions% 
@@ -325,20 +327,20 @@ print('{0:.2f}% of customers who downgraded have also cancelled their subscripti
     100*(len(down_cancel))/len(set(downgrade_reg_ids))))
 
 
-# In[230]:
+# In[81]:
 
 
 windowvalue = Window.partitionBy("userId").orderBy(desc("ts")).rangeBetween(Window.unboundedPreceding, 0)
 df = df.withColumn("churn_phase", Fsum("cancelled").over(windowvalue))    .withColumn("downgrade_phase", Fsum("downgraded").over(windowvalue))
 
 
-# In[231]:
+# In[82]:
 
 
 get_day = udf(lambda x: datetime.datetime.fromtimestamp(x/1000), DateType())
 
 
-# In[232]:
+# In[83]:
 
 
 song=udf(lambda x : int(x=='NextSong'), IntegerType())
@@ -346,7 +348,7 @@ home_visit=udf(lambda x : int(x=='Home'), IntegerType())
 df = df.withColumn('date', get_day(col('ts')))
 
 
-# In[233]:
+# In[84]:
 
 
 #Difference in number of songs played between users who churned or not
@@ -354,7 +356,7 @@ df.filter(col('churn_phase')==1).withColumn('songPlayed', song(col('page'))).agg
 df.filter(col('churn_phase')==0).withColumn('songPlayed', song(col('page'))).agg({'songPlayed':'mean'}).show()
 
 
-# In[234]:
+# In[85]:
 
 
 #number of songs played between home visits
@@ -365,7 +367,7 @@ cusum.filter((cusum.churn_phase == 1) &(cusum.page == 'NextSong'))     .groupBy(
 cusum.filter((cusum.churn_phase == 0) &(cusum.page == 'NextSong'))     .groupBy('userID', 'songPeriod')     .agg({'songPeriod':'count'})     .agg({'count(songPeriod)':'avg'}).show()
 
 
-# In[235]:
+# In[86]:
 
 
 days = lambda i: i * 86400 
@@ -373,7 +375,7 @@ daywindow = Window.partitionBy('userId', 'date').orderBy(desc('ts')).rangeBetwee
 get_day = udf(lambda x: datetime.datetime.fromtimestamp(x/1000), DateType())
 
 
-# In[236]:
+# In[87]:
 
 
 #Number of songs played daily
@@ -382,7 +384,7 @@ df.filter((df.page=='NextSong')&(col('churn_phase')==1)).select('userId', 'page'
 df.filter((df.page=='NextSong')&(col('churn_phase')==0)).select('userId', 'page', 'ts')    .withColumn('date', get_day(col('ts'))).groupBy('userId', 'date').count().describe().show()
 
 
-# In[237]:
+# In[88]:
 
 
 #number of songs couldn't be played due to errors
@@ -391,7 +393,7 @@ df.filter((df.page=='Error')&(df.churn_phase==1)).select('userId', 'page', 'ts',
 df.filter((df.page=='Error')&(df.churn_phase==0)).select('userId', 'page', 'ts', 'length')    .withColumn('date', get_day(col('ts')))    .groupBy('userId', 'date').agg({'page':'count'}).select('count(page)').describe().show()
 
 
-# In[238]:
+# In[89]:
 
 
 #Number of times user opted for help
@@ -400,7 +402,7 @@ df.filter((df.page=='Help')&(df.churn_phase==1)).select('userId', 'page', 'ts', 
 df.filter((df.page=='Help')&(df.churn_phase==0)).select('userId', 'page', 'ts', 'length')    .withColumn('date', get_day(col('ts')))    .groupBy('userId', 'date').agg({'page':'count'}).describe().show()
 
 
-# In[239]:
+# In[90]:
 
 
 #Ratio of those who cancelled subscriptions both free and paid
@@ -408,7 +410,7 @@ print(df.filter((df.page=='Cancellation Confirmation') & (df.level=='paid')).cou
 df.filter((df.page=='Cancellation Confirmation') & (df.level=='free')).count())
 
 
-# In[240]:
+# In[91]:
 
 
 #Number of users who downgraded & Number of users to cancel
@@ -416,28 +418,28 @@ print(df.filter(col('downgraded')==1).select('userId').dropDuplicates().count(),
       df.filter(col('cancelled')==1).select('userId').dropDuplicates().count())
 
 
-# In[241]:
+# In[92]:
 
 
 #Users who downgraded and then cancelled
 df.select(['userId', 'downgraded', 'cancelled'])    .groupBy('userId').sum()    .withColumnRenamed('sum(downgraded)', 'downgraded')    .withColumnRenamed('sum(cancelled)', 'cancelled')    .filter((col("downgraded")==1)&(col("cancelled")==1))    .count()
 
 
-# In[242]:
+# In[93]:
 
 
 #Number of users to cancel who downgrade
 df.select(['userId', 'downgraded', 'cancelled'])    .groupBy('userId').sum()    .withColumnRenamed('sum(downgraded)', 'downgraded')    .withColumnRenamed('sum(cancelled)', 'cancelled')    .filter((col("downgraded")==0)&(col("cancelled")==1))    .count()
 
 
-# In[243]:
+# In[94]:
 
 
 #Number of paid users to drop without downgrading
 print(df.filter((col('cancelled')==1) & (col('downgraded')==0) & (col('level')=='paid'))      .select('userId').dropDuplicates().count())
 
 
-# In[244]:
+# In[95]:
 
 
 #Those who churn or not have different listening habits?
@@ -453,14 +455,14 @@ df.filter(col('cancelled')==0).agg({'length':'mean'}).show()
 # 
 # If you are working in the classroom workspace, you can just extract features based on the small subset of data contained here. Be sure to transfer over this work to the larger dataset when you work on your Spark cluster.
 
-# In[245]:
+# In[96]:
 
 
 #Load data
 data_frame = spark.read.json('mini_sparkify_event_data.json')
 
 
-# In[246]:
+# In[97]:
 
 
 # Remov duplicate and return user
@@ -468,7 +470,7 @@ def user_info(df):
     return df.where((df.userId != "") | (df.sessionId != "")).select('userId').dropDuplicates()
 
 
-# In[247]:
+# In[98]:
 
 
 #Lstdown the userId to merge onto
@@ -476,7 +478,7 @@ users = user_info(data_frame)
 users.show()
 
 
-# In[248]:
+# In[99]:
 
 
 # Return average thumbs up 
@@ -485,7 +487,7 @@ def average_thumbs_up(df):
     return df.filter(df.page=='Thumbs Up').select('userId', 'page', 'ts')                    .withColumn('date', get_day(col('ts'))).groupBy('userId', 'date')                    .agg({'page':'count'}).groupBy('userId').mean()                    .withColumnRenamed('avg(count(page))', 'avgThumbsUp')
 
 
-# In[249]:
+# In[100]:
 
 
 #Define windows
@@ -494,7 +496,7 @@ windowval = Window.partitionBy("userId").orderBy(desc("ts")).rangeBetween(Window
 daywindow = Window.partitionBy('userId', 'date').orderBy(desc('ts')).rangeBetween(Window.unboundedPreceding, 0)
 
 
-# In[250]:
+# In[101]:
 
 
 #Average Thumb Up
@@ -502,7 +504,7 @@ avg_thumbs_up = average_thumbs_up(data_frame)
 avg_thumbs_up.show()
 
 
-# In[251]:
+# In[102]:
 
 
 # Return average thumbs down
@@ -511,7 +513,7 @@ def average_thumbs_down(df):
     return df.filter(df.page=='Thumbs Down')        .select('userId', 'page', 'ts')        .withColumn('date', get_day(col('ts')))        .groupBy('userId', 'date').agg({'page':'count'})        .groupBy('userId').mean()        .withColumnRenamed('avg(count(page))', 'avgThumbsDown')
 
 
-# In[252]:
+# In[103]:
 
 
 # Average Thumbs Down
@@ -519,7 +521,7 @@ avg_thumbs_down = average_thumbs_down(data_frame)
 avg_thumbs_down.show()
 
 
-# In[253]:
+# In[104]:
 
 
 # Return number of friends
@@ -527,7 +529,7 @@ def number_of_friends(df):
     return df.filter(df.page=='Add Friend')        .select('userId', 'page')        .groupBy('userId').count().withColumnRenamed('count', 'numFriends')
 
 
-# In[254]:
+# In[105]:
 
 
 # Number of Friends
@@ -535,7 +537,7 @@ num_friends = number_of_friends(data_frame)
 num_friends.show()
 
 
-# In[255]:
+# In[106]:
 
 
 # Return skipped attributes
@@ -546,7 +548,7 @@ def skipp_attributes(df):
     return df.select('userId', 'page', 'ts', 'length', 'sessionId', 'itemInSession')        .where((df.page != 'Thumbs Up') & (df.page != 'Thumbs Down'))        .withColumn('song', song('page')).orderBy('userId', 'sessionId', 'itemInSession')        .withColumn('nextActSong', lag(col('song')).over(session))        .withColumn('tsDiff', (lag('ts').over(session)-col('ts'))/1000)        .withColumn('timeSkipped', (floor('length')-col('tsDiff')))        .withColumn('roundedLength', floor('length'))        .where((col('song')==1) & ((col('nextActSong')!=0)&(col('timeSkipped')>=0)))        .withColumn('skipped', skipped('timeSkipped'))        .select('userId', 'timeSkipped', 'skipped', 'length', 'ts', 'tsDiff')        .groupBy('userId').agg({'skipped':'avg', 'timeSkipped':'avg'})        .withColumnRenamed('avg(skipped)', 'skipRate')        .withColumnRenamed('avg(timeSkipped)', 'avgTimeSkipped')
 
 
-# In[256]:
+# In[107]:
 
 
 #Average timeSkiped skipRate
@@ -554,7 +556,7 @@ skipping = skipp_attributes(data_frame)
 skipping.show()
 
 
-# In[257]:
+# In[108]:
 
 
 # Return who all are regular visiter of help site
@@ -564,7 +566,7 @@ def daily_visit_help_site(df):
     return df.filter(df.page=='Help')        .select('userId', 'page', 'ts', 'length')        .withColumn('date', get_day(col('ts')))        .groupBy('userId', 'date').agg({'page':'count'})        .groupBy('userId').mean()         .withColumnRenamed('avg(count(page))', 'dailyHelpVisits')
 
 
-# In[258]:
+# In[109]:
 
 
 #Avg daily visits to help site
@@ -572,7 +574,7 @@ daily_help_visit = daily_visit_help_site(data_frame)
 daily_help_visit.show()
 
 
-# In[259]:
+# In[110]:
 
 
 # Return daily error
@@ -581,7 +583,7 @@ def get_daily_error(df):
     return df.filter(df.page=='Error')        .select('userId', 'page', 'ts', 'length')        .withColumn('date', get_day(col('ts')))        .groupBy('userId', 'date').agg({'page':'count'})        .groupBy('userId').mean()        .withColumnRenamed('avg(count(page))', 'dailyErrors')
 
 
-# In[260]:
+# In[111]:
 
 
 #Shows daily error
@@ -589,7 +591,7 @@ daily_errors = get_daily_error(data_frame)
 daily_errors.show()
 
 
-# In[261]:
+# In[112]:
 
 
 # Return churn
@@ -605,7 +607,7 @@ def churn_user(df):
     
 
 
-# In[262]:
+# In[113]:
 
 
 #Whether a user has downgraded
@@ -613,7 +615,7 @@ churn = churn_user(data_frame)
 churn.show()
 
 
-# In[263]:
+# In[114]:
 
 
 # Return user level
@@ -625,7 +627,7 @@ def get_user_level(df):
     
 
 
-# In[264]:
+# In[115]:
 
 
 #shows use categories
@@ -633,7 +635,7 @@ user_level = get_user_level(data_frame)
 user_level.show()
 
 
-# In[265]:
+# In[116]:
 
 
 # Return cusum
@@ -643,7 +645,7 @@ def get_cusum(df):
    
 
 
-# In[266]:
+# In[117]:
 
 
 # Return average songs till home
@@ -651,7 +653,7 @@ def average_songs_till_home(cusum):
     return cusum.filter((cusum.page=='NextSong'))        .groupBy('userId', 'songPeriod')        .agg({'songPeriod':'count'}).drop('songPeriod')        .groupby('userId').mean()        .withColumnRenamed('avg(count(songPeriod))', 'avgSongsTillHome')
 
 
-# In[267]:
+# In[118]:
 
 
 #Average songs till in home page
@@ -660,7 +662,7 @@ avg_songs_till_home = average_songs_till_home(cusum)
 avg_songs_till_home.show()
 
 
-# In[268]:
+# In[119]:
 
 
 #Create necessary features to use machine learning algorithms    
@@ -668,7 +670,7 @@ df = users.join(churn, on='userId')    .join(daily_help_visit, on='userId')    .
 df.show()
 
 
-# In[269]:
+# In[120]:
 
 
 df.printSchema()
@@ -712,7 +714,7 @@ df.printSchema()
 # 6. Get descriptive stats
 # 
 
-# In[270]:
+# In[121]:
 
 
 def feature_scaling(df):
@@ -734,7 +736,7 @@ def feature_scaling(df):
 # # Modeling
 # Split the full dataset into train, test, and validation sets. Test out several of the machine learning methods you learned. Evaluate the accuracy of the various models, tuning parameters as necessary. Determine your winning model based on test accuracy and report results on the validation set. Since the churned users are a fairly small subset, I suggest using F1 score as the metric to optimize.
 
-# In[271]:
+# In[122]:
 
 
 #data_small = df
@@ -742,31 +744,29 @@ data_small = feature_scaling(df)
 data_small.persist()
 
 
-# In[272]:
+# In[123]:
 
 
 data_small.take(1)
 
 
-# In[273]:
+# In[124]:
 
 
 train, rest = data_small.randomSplit([0.85, 0.15], seed=42)
 validation, test = rest.randomSplit([0.5,0.5], seed=42)
 
 
-# In[274]:
+# In[125]:
 
 
 pr = BinaryClassificationEvaluator(metricName='areaUnderPR')
 roc = BinaryClassificationEvaluator(metricName='areaUnderROC')
 
 
-# In[275]:
+# In[126]:
 
 
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 def custom_evaluation(pred, model_name):
     '''
@@ -795,7 +795,7 @@ def custom_evaluation(pred, model_name):
     plt.show()
 
 
-# In[276]:
+# In[127]:
 
 
 #Random forest classifier model
@@ -805,7 +805,7 @@ rando_forest_preds = rando_forest_model.transform(validation)
 custom_evaluation(rando_forest_preds, 'Random Forest')
 
 
-# In[277]:
+# In[128]:
 
 
 #Gradient boosted trees (ie ada boost)
@@ -815,7 +815,7 @@ gbtree_preds = gbtree_model.transform(validation)
 custom_evaluation(gbtree_preds, 'Gradient Boosted Trees')
 
 
-# In[278]:
+# In[129]:
 
 
 #SVM
@@ -825,7 +825,7 @@ svm_preds=svm_model.transform(validation)
 custom_evaluation(svm_preds, 'Support Vector Machine')
 
 
-# In[279]:
+# In[130]:
 
 
 #Logistic regression model
@@ -835,7 +835,7 @@ lr_preds = lrModel.transform(validation)
 custom_evaluation(lr_preds, 'Logistic Regression')
 
 
-# In[280]:
+# In[131]:
 
 
 #Visual check for predictions
@@ -843,7 +843,7 @@ for x in [svm_preds, lr_preds, gbtree_preds, rando_forest_preds]:
     x.select('features', 'rawPrediction', 'prediction', 'label').show()
 
 
-# In[281]:
+# In[132]:
 
 
 # Evaluate model
